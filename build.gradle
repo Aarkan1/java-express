@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0.0'
+
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'io.javalin:javalin:3.12.0'
+    compile 'org.dizitart:nitrite:3.4.2'
+    compile 'net.oneandone.reflections8:reflections8:0.11.7'
+    compile 'org.slf4j:slf4j-simple:1.7.28'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.12.0-rc1'
+}
