@@ -13,7 +13,7 @@ app.listen(); // Will listen on port 80 which is set as default
 
 ### Download
 **Direct download as jar:** 
-[Latest java-express-1.0.0.jar](https://github.com/Aarkan1/java-express/raw/master/releases/java-express-1.0.0.jar)
+[Latest java-express-1.0.0.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.0.jar)
 
 **Old version:**
 [Older versions](https://github.com/Aarkan1/java-express/tree/master/releases)
