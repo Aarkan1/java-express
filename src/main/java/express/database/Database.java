@@ -134,7 +134,9 @@ public class Database {
 
         express.get("/rest/:coll", (req, res) -> {
             String coll = req.params("coll");
-            res.json(Map.of(idFields.get(coll), collection(coll).find()));
+            Map data = new HashMap();
+            data.put(idFields.get(coll), collection(coll).find());
+            res.json(data);
         });
 
         express.delete("/rest/:coll/:id", (req, res) -> {
@@ -182,7 +184,11 @@ public class Database {
             ws.onConnect(ctx -> clients.add(ctx));
             ws.onClose(ctx -> clients.remove(ctx));
             collNames.forEach(coll ->
-                collection(coll).watch(watchData -> clients.forEach(client -> client.send(Map.of(coll, watchData)))
+                collection(coll).watch(watchData -> {
+                    Map data = new HashMap();
+                    data.put(coll, watchData);
+                    clients.forEach(client -> client.send(data));
+                }
             ));
         });
     }
