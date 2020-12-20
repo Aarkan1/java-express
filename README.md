@@ -13,7 +13,7 @@ app.listen(); // Will listen on port 8080 which is set as default
 
 ### Download
 **Direct download as jar:** 
-[Latest java-express-1.0.2.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.2.jar)
+[Latest java-express-1.0.3.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.3.jar)
 
 **Old version:**
 [Older versions](https://github.com/Aarkan1/java-express/tree/master/releases)
@@ -32,7 +32,7 @@ app.listen(); // Will listen on port 8080 which is set as default
 <dependency>
     <groupId>com.github.Aarkan1</groupId>
     <artifactId>java-express</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Aarkan1:java-express:1.0.2'
+    implementation 'com.github.Aarkan1:java-express:1.0.3'
 }
 ```
 
