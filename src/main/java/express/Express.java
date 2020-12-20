@@ -17,7 +17,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-
+/**
+ * The Express layer on top of Javalin
+ *
+ * @author Johan Wirén
+ */
 public class Express {
     private final Javalin app;
     private final Map<String, Object> locals = new ConcurrentHashMap<>();
