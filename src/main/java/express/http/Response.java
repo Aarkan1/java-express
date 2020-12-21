@@ -1,6 +1,6 @@
 package express.http;
 
-import io.javalin.http.Context;
+import io.javalin.http.*;
 import io.javalin.plugin.json.JavalinJson;
 
 import javax.servlet.http.Cookie;
@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,7 +22,10 @@ public class Response {
     }
 
     public Context ctx() { return ctx; }
-    public Response send(String text) { ctx.result(text); return this; }
+    public Response send(String text) {
+        type("text/html");
+        ctx.result(text);
+        return this; }
     public Response send(Object obj) { ctx.result(JavalinJson.toJson(obj)); return this; }
     public Response send(InputStream stream) { ctx.result(stream); return this; }
     public Response send(byte[] bytes) { ctx.result(bytes); return this; }
@@ -34,7 +38,7 @@ public class Response {
     }
     public Response attachment(String path) {
         String filename = path.substring(path.lastIndexOf("/") + 1);
-        String extension = path.substring(path.lastIndexOf(".") + 1);
+        String extension = path.substring((path.lastIndexOf(".") + 1));
         ctx.header("Content-Disposition", "attachment; filename=\"" + filename + "\"");
         type(extension);
         return this;
@@ -74,6 +78,39 @@ public class Response {
             e.printStackTrace();
         }
         return this;
+    }
+
+    public void stop() { stop(null); }
+
+    public void stop(String text) {
+        switch (status()) {
+            case 302:
+                throw new RedirectResponse();
+            case 400:
+                throw new BadRequestResponse(text == null ? "BadRequest" : text);
+            case 401:
+                throw new UnauthorizedResponse(text == null ? "Unauthorized" : text);
+            case 404:
+                throw new NotFoundResponse(text == null ? "NotFound" : text);
+            case 405:
+                Map<String, String> details = new HashMap<>();
+                details.put("method", ctx.method());
+                throw new MethodNotAllowedResponse(text == null ? "MethodNotAllowed" : text, details);
+            case 409:
+                throw new ConflictResponse(text == null ? "Conflict" : text);
+            case 410:
+                throw new GoneResponse(text == null ? "Gone" : text);
+            case 500:
+                throw new InternalServerErrorResponse(text == null ? "InternalServerError" : text);
+            case 502:
+                throw new BadGatewayResponse(text == null ? "BadGateway" : text);
+            case 503:
+                throw new ServiceUnavailableResponse(text == null ? "ServiceUnavailable" : text);
+            case 504:
+                throw new GatewayTimeoutResponse(text == null ? "GatewayTimeout" : text);
+            default:
+                throw new ForbiddenResponse(text == null ? "Forbidden" : text);
+        }
     }
 
 //    public Response headersSent() {  }
