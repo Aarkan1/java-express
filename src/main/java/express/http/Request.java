@@ -8,6 +8,8 @@ import java.util.Map;
 
 /**
  * @author Johan Wirén
+ *
+ * The Request object wrapping Javalins Context
  */
 public class Request {
     private final Context ctx;

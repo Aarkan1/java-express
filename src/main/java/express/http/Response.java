@@ -49,6 +49,20 @@ public class Response {
         type(extension);
         return this;
     }
+    public Response download(Path path) { attachment(path.toString()); sendFile(path); return this; }
+
+    public Response sendFile(Path path) {
+        MediaType fromExtension = MediaType.getByExtension(
+                path.toString().substring(path.toString().lastIndexOf(".") + 1)
+        );
+        ctx.contentType(fromExtension != null ? fromExtension.getMIME() : "text/plain");
+        try {
+            ctx.result(Files.newInputStream(path));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
     public Response cookie(String name, String value) { ctx.cookie(name, value); return this; }
     public Response cookie(Cookie cookie) { ctx.cookie(cookie); return this; }
     public Response clearCookie(String name, String path) { ctx.removeCookie(name, path); return this; }
@@ -71,20 +85,7 @@ public class Response {
         ctx.contentType(fromExtension != null ? fromExtension.getMIME() : contentType);
         return this;
     }
-    public Response download(Path path) { attachment(path.toString()); sendFile(path); return this; }
 
-    public Response sendFile(Path path) {
-        MediaType fromExtension = MediaType.getByExtension(
-                path.toString().substring(path.toString().lastIndexOf(".") + 1)
-        );
-        ctx.contentType(fromExtension != null ? fromExtension.getMIME() : "text/plain");
-        try {
-            ctx.result(Files.newInputStream(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return this;
-    }
 
     public void stop() { stop(null); }
 
