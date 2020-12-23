@@ -86,11 +86,6 @@ public class Express {
         return this;
     }
 
-    public Express watchCollections() {
-        Database.watchCollections();
-        return this;
-    }
-
     public Express useStatic(Path path) {
         useStatic(path.toString(), Location.EXTERNAL);
         return this;
@@ -214,12 +209,10 @@ public class Express {
         return (List<Object>) locals.values();
     }
 
-    public Object locals(String key) {
-        return locals.get(key);
-    }
+    public <T> T locals(String name) { return (T) locals.get(name); }
 
-    public Express locals(String key, Object obj) {
-        locals.put(key, obj);
+    public Express locals(String name, Object obj) {
+        locals.put(name, obj);
         return this;
     }
 
@@ -241,7 +234,7 @@ public class Express {
         return this;
     }
 
-    public Object get(String name) { return locals.get(name); }
+    public <T> T get(String name) { return (T) locals.get(name); }
 
     public void listen() {
         listen(8080);
@@ -255,9 +248,7 @@ public class Express {
         app.start(hostname, port);
     }
 
-    public void stop() {
-        app.stop();
-    }
+    public void stop() { app.stop(); }
 
 
 //    public Express mountpath() { return this; }
