@@ -34,7 +34,6 @@ public class Database {
     private static Logger logger;
     private static boolean enableWatcher = false;
     private static boolean disableBrowser = false;
-    private static Set<String> collNames;
 
     public Database(Express app) {
         Database.app = app;
@@ -100,7 +99,7 @@ public class Database {
 
         Reflections reflections = new Reflections();
         Set<Class<?>> klasses = reflections.getTypesAnnotatedWith(Model.class);
-        collNames = klasses.stream().map(Class::getSimpleName).collect(Collectors.toSet());
+        Set<String> collNames = klasses.stream().map(Class::getSimpleName).collect(Collectors.toSet());
         Map<String, String> idFields = new HashMap<>();
 
         if(klasses.isEmpty()) throw new ModelsNotFoundException("Must have a class with @Model to use embedded database.");
@@ -118,10 +117,13 @@ public class Database {
         });
 
         enabledDatabase = true;
-//        if (enableWatcher) watchCollections(collNames);
+        if (enableWatcher) watchCollections(collNames);
         if(!disableBrowser) initBrowser(collNames, idFields);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(db::close));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            db.close();
+            closeBrowser();
+        }));
     }
 
     /**
@@ -149,10 +151,9 @@ public class Database {
         express.useStatic("/public", Location.CLASSPATH);
 
         express.listen(9595);
-        System.out.println("\nBrowse collections: \thttp://localhost:9595");
     }
 
-    public void closeBrowser() {
+    private static void closeBrowser() {
         if(express != null) express.stop();
     }
 
@@ -179,7 +180,7 @@ public class Database {
         }
     }
 
-    public static void watchCollections() {
+    private static void watchCollections(Set<String> collNames) {
         app.ws("/watch-collections", ws -> {
             ws.onConnect(ctx -> clients.add(ctx));
             ws.onClose(ctx -> clients.remove(ctx));
@@ -187,7 +188,8 @@ public class Database {
                 collection(coll).watch(watchData -> {
                     Map data = new HashMap();
                     data.put(coll, watchData);
-                    clients.forEach(client -> client.send(data));
+                    clients.stream().filter(client -> client.session.isOpen())
+                            .forEach(client -> client.send(data));
                 }
             ));
         });
