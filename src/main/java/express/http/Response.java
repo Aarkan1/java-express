@@ -13,6 +13,8 @@ import java.util.Map;
 
 /**
  * @author Johan Wirén
+ *
+ * The Response object wrapping Javalins Context
  */
 public class Response {
     private final Context ctx;
@@ -29,7 +31,11 @@ public class Response {
     public Response send(Object obj) { ctx.result(JavalinJson.toJson(obj)); return this; }
     public Response send(InputStream stream) { ctx.result(stream); return this; }
     public Response send(byte[] bytes) { ctx.result(bytes); return this; }
-    public Response json(Object json) { ctx.json(json); return this; }
+    public Response json(Object json) {
+        if(json == null) send("null");
+        else ctx.json(json);
+        return this;
+    }
 
     public Response append(String name, String value) { ctx.header(name, value); return this; }
     public Response attachment() {
@@ -37,7 +43,7 @@ public class Response {
         return this;
     }
     public Response attachment(String path) {
-        String filename = path.substring(path.lastIndexOf("/") + 1);
+        String filename = path.substring(path.lastIndexOf(path.contains("/") ? '/' : '\\') + 1);
         String extension = path.substring((path.lastIndexOf(".") + 1));
         ctx.header("Content-Disposition", "attachment; filename=\"" + filename + "\"");
         type(extension);
@@ -90,6 +96,8 @@ public class Response {
                 throw new BadRequestResponse(text == null ? "BadRequest" : text);
             case 401:
                 throw new UnauthorizedResponse(text == null ? "Unauthorized" : text);
+            case 403:
+                throw new ForbiddenResponse(text == null ? "Forbidden" : text);
             case 404:
                 throw new NotFoundResponse(text == null ? "NotFound" : text);
             case 405:
@@ -109,7 +117,8 @@ public class Response {
             case 504:
                 throw new GatewayTimeoutResponse(text == null ? "GatewayTimeout" : text);
             default:
-                throw new ForbiddenResponse(text == null ? "Forbidden" : text);
+                Map<String, String> det = new HashMap<>();
+                throw new HttpResponseException(status(), text == null ? "NoResponse" : text, det);
         }
     }
 
