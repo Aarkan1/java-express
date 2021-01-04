@@ -8,8 +8,17 @@ import java.util.List;
  * Wrapper object to handle collection events
  */
 public class WatchData {
+    private String model;
     private String event;
     private List data;
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
 
     public String getEvent() {
         return event;

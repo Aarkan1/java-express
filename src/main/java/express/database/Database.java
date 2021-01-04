@@ -185,12 +185,9 @@ public class Database {
             ws.onConnect(ctx -> clients.add(ctx));
             ws.onClose(ctx -> clients.remove(ctx));
             collNames.forEach(coll ->
-                collection(coll).watch(watchData -> {
-                    Map data = new HashMap();
-                    data.put(coll, watchData);
+                collection(coll).watch(watchData ->
                     clients.stream().filter(client -> client.session.isOpen())
-                            .forEach(client -> client.send(data));
-                }
+                    .forEach(client -> client.send(watchData))
             ));
         });
     }

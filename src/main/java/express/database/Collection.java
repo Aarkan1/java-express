@@ -136,6 +136,7 @@ public class Collection {
         NitriteMapper mapper = new JacksonMapper();
         repo.register(changeInfo -> {
             WatchData watchData = new WatchData();
+            watchData.setModel(klass.getSimpleName());
             watchData.setEvent(changeInfo.getChangeType().toString().equals("REMOVE") ? "delete" : changeInfo.getChangeType().toString().toLowerCase());
             List items = new ArrayList();
 

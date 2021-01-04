@@ -6,7 +6,7 @@ app.get("/", (req, res) -> {
    res.send("Hello World");
 });
 
-app.listen(); // Will listen on port 8080 which is set as default
+app.listen(); // Will listen on port 80 which is set as default
 ```
 
 ## Installation

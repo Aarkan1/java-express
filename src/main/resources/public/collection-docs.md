@@ -96,24 +96,36 @@ app.enableCollections(CollectionOptions.ENABLE_WATCHER, CollectionOptions.DISABL
 
 This starts an WebSocket endpoint in the database that will send a WebSocket when a change happens.
 
-To listen to these events on the client you have to create a connection to `'/watch-collections'` with an `EventSource`.
+To listen to these events on the client you have to create a connection to `'ws://<hostname>:<port>/watch-collections'` with `WebSocket`.
 
 ```js
-let colls = new EventSource('/watch-collections')
+let ws = new WebSocket('ws://localhost:3000/watch-collections')
 ```
 
-With the eventSource you can add listeners to each model in the collection.
+With the webSocket you can listen to messages from the collection channel.
 
 ```js
-// listen to changes to the 'BlogPost' collection 
-colls.addEventListener('BlogPost', (messageEvent) => {
-    // handle event
-}
+ws.onmessage = messageEvent => {
+    const watchData = JSON.parse(messageEvent.data);
 
-// listen to changes to the 'Message' collection 
-colls.addEventListener('Message', (messageEvent) => {
-    // handle event
-});
+    // deconstruct model, event and data from watchData
+    const { model, event, data } = watchData;
+
+    switch(event) {
+        case 'insert':
+            // add post to list
+            model == 'BlogPost' && posts.push(data[0]);
+            
+            model == 'Message' && // add message to list
+        break;
+        case 'update':
+        break;
+        case 'delete':
+            // remove post from list
+            model == 'BlogPost' && posts = posts.filter(post => post.id !== data[0].id);
+        break;
+    };
+};
 ```
 
 #### Examples

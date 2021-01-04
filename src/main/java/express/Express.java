@@ -237,7 +237,7 @@ public class Express {
     public <T> T get(String name) { return (T) locals.get(name); }
 
     public void listen() {
-        listen(8080);
+        listen(80);
     }
 
     public void listen(int port) {
