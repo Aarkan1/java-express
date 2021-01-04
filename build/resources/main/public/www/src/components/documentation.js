@@ -98,56 +98,64 @@ Options available are:</p>
 <span class="hljs-title">app</span>.<span class="hljs-title">enableCollections</span>(<span class="hljs-type">CollectionOptions</span>.<span class="hljs-type">ENABLE_WATCHER</span>, <span class="hljs-type">CollectionOptions</span>.<span class="hljs-type">DISABLE_BROWSER</span>);</span>
 </code></pre>
 <p><strong>ENABLE_WATCHER</strong></p>
-<p>This starts an event stream endpoint in the database that will send a Server Side Event when a change happens.</p>
-<p>To listen to these events on the client you have to create a connection to <code>&#39;/watch-collections&#39;</code> with an <code>EventSource</code>.</p>
-<pre><code class="lang-js"><span class="hljs-keyword">let</span> colls = <span class="hljs-keyword">new</span> EventSource(<span class="hljs-string">'/watch-collections'</span>)
-</code></pre>
-<p>With the eventSource you can add listeners to each model in the collection.</p>
-<pre><code class="lang-js"><span class="hljs-regexp">//</span> listen to changes to the <span class="hljs-string">'BlogPost'</span> collection 
-colls.addEventListener(<span class="hljs-string">'BlogPost'</span>, <span class="hljs-function"><span class="hljs-params">(messageEvent)</span> =&gt;</span> {
-    <span class="hljs-regexp">//</span> handle event
-}
 
-<span class="hljs-regexp">//</span> listen to changes to the <span class="hljs-string">'Message'</span> collection 
-colls.addEventListener(<span class="hljs-string">'Message'</span>, <span class="hljs-function"><span class="hljs-params">(messageEvent)</span> =&gt;</span> {
-    <span class="hljs-regexp">//</span> handle event
-});
+<p>This starts an <code>WebSocket</code> endpoint in the database that will send <em>watchData</em> when a change happens.</p>
+<p><strong>WatchData</strong> is an object containing <em>model</em>, <em>event</em>, <em>data</em>.</p>
+<ul>
+<li><em>model</em>: The collection that were triggered</li>
+<li><em>event</em>: The event that was triggered, &#39;insert&#39;, &#39;update&#39; or &#39;delete&#39;</li>
+<li><em>data</em>: List of items that are related to the change</li>
+</ul>
+<p>To listen to these events on the client you have to create a connection to <code>&#39;ws://&lt;hostname&gt;:&lt;port&gt;/watch-collections&#39;</code> with <code>WebSocket</code>.</p>
+<pre><code class="lang-js"><span class="hljs-keyword">let</span> <span class="hljs-keyword">ws</span> = <span class="hljs-keyword">new</span> WebSocket(<span class="hljs-string">'ws://localhost:3000/watch-collections'</span>)
 </code></pre>
-<h4>Examples</h4>
+<p>With the webSocket you can listen to messages from the collection channel.</p>
+<pre><code class="lang-js">ws.onmessage = <span class="hljs-function"><span class="hljs-params">messageEvent</span> =&gt;</span> {
+    <span class="hljs-keyword">const</span> watchData = <span class="hljs-built_in">JSON</span>.parse(messageEvent.data);
+
+    <span class="hljs-comment">// deconstruct model, event and data from watchData</span>
+    <span class="hljs-keyword">const</span> { model, event, data } = watchData;
+
+    <span class="hljs-keyword">if</span>(model == <span class="hljs-string">'BlogPost'</span>) {
+        <span class="hljs-comment">// do something with BlogPost</span>
+    } 
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(model == <span class="hljs-string">'Message'</span>) {
+        <span class="hljs-comment">// do something with Message</span>
+    }
+};
+</code></pre>
+<h4 id="example">Example</h4>
 <p>Java:</p>
 <pre><code class="lang-java"><span class="hljs-type">Express</span> app = <span class="hljs-function"><span class="hljs-keyword">new</span> <span class="hljs-title">Express</span>();
 <span class="hljs-title">app</span>.<span class="hljs-title">enableCollections</span>(<span class="hljs-type">CollectionOptions</span>.<span class="hljs-type">ENABLE_WATCHER</span>);</span>
 </code></pre>
 <p>JavaScript:</p>
-<pre><code class="lang-js"><span class="hljs-keyword">let</span> colls = <span class="hljs-keyword">new</span> EventSource(<span class="hljs-string">'/watch-collections'</span>);
+<pre><code class="lang-js">ws.onmessage = <span class="hljs-function"><span class="hljs-params">messageEvent</span> =&gt;</span> {
+    <span class="hljs-keyword">const</span> watchData = <span class="hljs-built_in">JSON</span>.parse(messageEvent.data);
 
-colls.addEventListener(<span class="hljs-string">'BlogPost'</span>, (messageEvent) =&gt; {
-    <span class="hljs-keyword">const</span> { event, data } = <span class="hljs-built_in">JSON</span>.parse(messageEvent.data);
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"BlogPost event:"</span>, event, data);
+    <span class="hljs-comment">// deconstruct model, event and data from watchData</span>
+    <span class="hljs-keyword">const</span> { model, event, data } = watchData;
 
     <span class="hljs-keyword">switch</span>(event) {
         <span class="hljs-keyword">case</span> <span class="hljs-string">'insert'</span>:
-            <span class="hljs-comment">// add new post to list</span>
-            posts.push(data[<span class="hljs-number">0</span>]);
+            <span class="hljs-comment">// add post to list</span>
+            model == <span class="hljs-string">'BlogPost'</span> &amp;&amp; posts.push(data[<span class="hljs-number">0</span>]);
+            model == <span class="hljs-string">'Message'</span> &amp;&amp; <span class="hljs-comment">// add message to list</span>
         <span class="hljs-keyword">break</span>;
         <span class="hljs-keyword">case</span> <span class="hljs-string">'update'</span>:
-            <span class="hljs-comment">// do something on update</span>
         <span class="hljs-keyword">break</span>;
         <span class="hljs-keyword">case</span> <span class="hljs-string">'delete'</span>:
-            <span class="hljs-comment">// remove deleted post from list</span>
-            posts = posts.filter(<span class="hljs-function"><span class="hljs-params">post</span> =&gt;</span> post.id !== data[<span class="hljs-number">0</span>].id);
+            <span class="hljs-comment">// remove post from list</span>
+            model == <span class="hljs-string">'BlogPost'</span> &amp;&amp; (posts = posts.filter(<span class="hljs-function"><span class="hljs-params">post</span> =&gt;</span> post.id !== data[<span class="hljs-number">0</span>].id));
         <span class="hljs-keyword">break</span>;
-    }
+    };
 
     <span class="hljs-comment">// update </span>
     renderPosts();
-});
-
-colls.addEventListener(<span class="hljs-string">'Message'</span>, (messageEvent) =&gt; {
-    <span class="hljs-keyword">const</span> { event, data } = <span class="hljs-built_in">JSON</span>.parse(messageEvent.data);
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Message event:'</span>, event, data);
-});
+};
 </code></pre>
+
+
 <p><strong>DISABLE_BROWSER</strong></p>
 <p>This will simple disable the collection browser. This might be a good idea to save CPU and RAM when deploying. </p>
 <pre><code class="lang-java"><span class="hljs-type">Express</span> app = <span class="hljs-function"><span class="hljs-keyword">new</span> <span class="hljs-title">Express</span>();

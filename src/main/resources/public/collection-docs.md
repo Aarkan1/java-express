@@ -94,7 +94,12 @@ app.enableCollections(CollectionOptions.ENABLE_WATCHER, CollectionOptions.DISABL
 
 **ENABLE_WATCHER**
 
-This starts an WebSocket endpoint in the database that will send a WebSocket when a change happens.
+This starts an `WebSocket` endpoint in the database that will send *watchData* when a change happens.
+
+**WatchData** is an object containing *model*, *event*, *data*.
+- *model*: The collection that were triggered
+- *event*: The event that was triggered, 'insert', 'update' or 'delete'
+- *data*: List of items that are related to the change
 
 To listen to these events on the client you have to create a connection to `'ws://<hostname>:<port>/watch-collections'` with `WebSocket`.
 
@@ -111,24 +116,16 @@ ws.onmessage = messageEvent => {
     // deconstruct model, event and data from watchData
     const { model, event, data } = watchData;
 
-    switch(event) {
-        case 'insert':
-            // add post to list
-            model == 'BlogPost' && posts.push(data[0]);
-            
-            model == 'Message' && // add message to list
-        break;
-        case 'update':
-        break;
-        case 'delete':
-            // remove post from list
-            model == 'BlogPost' && posts = posts.filter(post => post.id !== data[0].id);
-        break;
-    };
+    if(model == 'BlogPost') {
+        // do something with BlogPost
+    } 
+    else if(model == 'Message') {
+        // do something with Message
+    }
 };
 ```
 
-#### Examples
+#### Example
 
 Java:
 ```java
@@ -138,39 +135,34 @@ app.enableCollections(CollectionOptions.ENABLE_WATCHER);
 
 JavaScript:
 ```js
-let colls = new EventSource('/watch-collections');
+ws.onmessage = messageEvent => {
+    const watchData = JSON.parse(messageEvent.data);
 
-colls.addEventListener('BlogPost', (messageEvent) => {
-    const { event, data } = JSON.parse(messageEvent.data);
-    console.log("BlogPost event:", event, data);
+    // deconstruct model, event and data from watchData
+    const { model, event, data } = watchData;
 
     switch(event) {
         case 'insert':
-            // add new post to list
-            posts.push(data[0]);
+            // add post to list
+            model == 'BlogPost' && posts.push(data[0]);
+            model == 'Message' && // add message to list
         break;
         case 'update':
-            // do something on update
         break;
         case 'delete':
-            // remove deleted post from list
-            posts = posts.filter(post => post.id !== data[0].id);
+            // remove post from list
+            model == 'BlogPost' && (posts = posts.filter(post => post.id !== data[0].id));
         break;
-    }
+    };
 
     // update 
     renderPosts();
-});
-
-colls.addEventListener('Message', (messageEvent) => {
-    const { event, data } = JSON.parse(messageEvent.data);
-    console.log('Message event:', event, data);
-});
+};
 ```
 
 **DISABLE_BROWSER**
 
-This will simple disable the collection browser. This might be a good idea to save CPU and RAM when deploying. 
+This will simply disable the collection browser. This might be a good idea to save CPU and RAM when deploying. 
 
 ```java
 Express app = new Express();
