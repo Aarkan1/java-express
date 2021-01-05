@@ -12,16 +12,13 @@ import org.dizitart.no2.Nitrite;
 import org.dizitart.no2.objects.Id;
 import org.reflections8.Reflections;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * @author Johan Wirén
@@ -90,12 +87,8 @@ public class Database {
     private static void init(String dbPath) throws ModelsNotFoundException {
         logger = Logger.getLogger(Database.class.getSimpleName());
 
-        if(dbPath.startsWith("db/")) {
-            File directory = new File(Paths.get("db").toString());
-            if (! directory.exists()){
-                directory.mkdir();
-            }
-        }
+        File directory = new File(Paths.get(dbPath).toString());
+        directory.getParentFile().mkdirs(); // create parent dirs if necessary
 
         Nitrite db = Nitrite.builder()
                 .compressed()
@@ -129,7 +122,7 @@ public class Database {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             db.close();
-            closeBrowser();
+            if(express != null) express.stop();
         }));
     }
 
@@ -165,7 +158,7 @@ public class Database {
             try {
                 for(Object obj : objects) models.add(mapper.readValue(mapper.writeValueAsBytes(obj), klass));
             } catch (UnrecognizedPropertyException e) {
-                e.printStackTrace();
+                logger.log(Level.WARNING, "Could not convert JSON.", e);
                 res.status(500).stop(e.getMessage());
             }
             res.json(collection(klass).save(models));
@@ -176,15 +169,12 @@ public class Database {
         });
 
         express.get("/api/export-collection/:coll", (req, res) -> {
-            File directory = new File(Paths.get("db").toString());
-            if (! directory.exists()){
-                directory.mkdir();
-            }
             String coll = req.params("coll");
             List models = collection(coll).find();
             String path = Paths.get("db/" + coll + ".json").toString();
             File file = new File(path);
-            if(file.exists()) file.delete();
+            file.getParentFile().mkdirs();   // create parent dirs if necessary
+            if(file.exists()) file.delete(); // replace existing file
             new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(new File(path), models);
             res.sendFile(Paths.get("db/" + coll + ".json"));
         });
@@ -192,18 +182,6 @@ public class Database {
         express.useStatic("/public", Location.CLASSPATH);
 
         express.listen(9595);
-    }
-
-    private static <T> T castToType(Object obj, Class<T> klass) {
-        return (T) obj;
-    }
-
-    private static <T> T saveImport(Object obj, Class<T> klass) {
-        return collection(klass).save(obj);
-    }
-
-    private static void closeBrowser() {
-        if(express != null) express.stop();
     }
 
     public static Collection collection(Object model) {

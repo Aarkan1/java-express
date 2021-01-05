@@ -30,12 +30,12 @@ public class Express {
     public Express() {
         app = Javalin.create();
         app.config.showJavalinBanner = false;
+        Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
     }
 
     public Express(Consumer<JavalinConfig> config) {
         app = Javalin.create(config);
         app.config.showJavalinBanner = false;
-
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
     }
 
@@ -227,8 +227,6 @@ public class Express {
     public boolean enabled(String name) { return ((boolean) locals.get(name) == true); }
     public boolean disabled(String name) { return ((boolean) locals.get(name) == false); }
 
-    public Express param() { return this; }
-    public Express route() { return this; }
     public Express set(String name, Object obj) {
         locals.put(name, obj);
         return this;
@@ -252,6 +250,8 @@ public class Express {
 
 
 //    public Express mountpath() { return this; }
+//    public Express param() { return this; }
+//    public Express route() { return this; }
 //    public Express router() { return this; }
 //    public Express mount() { return this; }
 //    public Express engine() { return this; }
