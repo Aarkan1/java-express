@@ -8,6 +8,7 @@ import org.dizitart.no2.mapper.NitriteMapper;
 import org.dizitart.no2.objects.Id;
 import org.dizitart.no2.objects.ObjectFilter;
 import org.dizitart.no2.objects.ObjectRepository;
+import org.dizitart.no2.objects.filters.ObjectFilters;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -108,6 +109,10 @@ public class Collection {
     public int updateById(String id, Object model) {
         Map<String, String> field = getIdField();
         return repo.update(eq(field.get("name"), id), model).getAffectedCount();
+    }
+
+    public int delete() {
+        return delete(ObjectFilters.ALL);
     }
 
     public int delete(Object model) {

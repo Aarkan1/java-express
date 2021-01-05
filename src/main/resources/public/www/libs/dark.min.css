@@ -11,12 +11,12 @@ dialog > header {
     background-color: #161f27;
 }
 
-dialog menu > button:first-child {
-    background-color:  rgb(151, 43, 43);
+.button-warn {
+    background-color:  rgb(151, 43, 43) !important;
 }
 
-dialog menu > button:first-child:hover {
-    background-color:  rgb(170, 89, 89);
+.button-warn:hover {
+    background-color:  rgb(170, 89, 89) !important;
 }
 
 main {
@@ -32,6 +32,13 @@ aside a {
     border-right: 0.6em solid rgba(255, 255, 255, 0.2);
     border-bottom: 0.6em solid rgba(255, 255, 255, 0.2);
     border-left: 0.6em solid  #dbdbdb;
+}
+
+button > .loader {
+    border-top: 0.3em solid rgba(255, 255, 255, 0.2);
+    border-right: 0.3em solid rgba(255, 255, 255, 0.2);
+    border-bottom: 0.3em solid rgba(255, 255, 255, 0.2);
+    border-left: 0.3em solid  #dbdbdb;
 }
 
 code {
@@ -60,4 +67,18 @@ code::selection, span::selection {
 .hljs-literal {
     font-weight: 700;
     color: #8959a8;
+}
+
+.coll-header > button {
+    background: #324759;
+}
+
+.coll-header > button:hover, input[type="file"]:hover {
+    background: #3e596e;
+}
+
+input[type="file"] {
+    background-color: #324759;
+    padding: 9px;
+    cursor: pointer;
 }

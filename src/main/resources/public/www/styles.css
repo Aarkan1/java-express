@@ -17,10 +17,29 @@ main {
 #app {
     display: grid;
     grid-template-columns: 0.2fr 1fr;
-    grid-template-rows: 100px 1fr 50px;
+    grid-template-rows: 80px 1fr 50px;
     height: 100vh;
     max-width: 1000px;
     margin: 0 auto;
+}
+
+.coll-header {
+  padding-top: 10px;
+}
+
+.coll-header > h2 {
+  display: inline;
+}
+
+.coll-header > button, .coll-header > input {
+  float: right;
+  max-width: 230px;
+}
+
+.coll-header > button {
+  width: 90px;
+  text-align: center;
+  padding: 10px 0;
 }
 
 td, th {
@@ -42,6 +61,10 @@ aside {
     grid-template-rows: 1fr 30px;
     height: 100%;
     padding-right: 25px;
+}
+
+aside ul {
+  margin-top: 0;
 }
 
 aside a {
@@ -202,6 +225,14 @@ dialog menu > button {
     width: 4em;
     height: 4em;
   }
+
+  button > .loader,
+  button > .loader:after {
+    margin: 1px auto;
+    width: 2em;
+    height: 2em;
+  }
+
   .loader {
     margin: 20px;
     font-size: 10px;

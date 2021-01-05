@@ -5,7 +5,18 @@ export default {
     name: 'Collections',
     template: `
         <div>
-            <h2>{{ activeColl }} Collection</h2>
+            <div class="coll-header">
+                <h2>{{ activeColl }}</h2>
+                <button @click="openDropCollModal" class="button-warn">Drop</button>
+                <button @click="exportJSON">Export</button>
+                <button v-if="isImporting"><div class="loader"></div></button>
+                <button v-else @click="importJSON">Import</button>
+                <input type="file" accept="application/json" ref="jsonFile">
+            </div>
+                <p v-if="errorMessage" id="important-note">
+                    Failed to import json: <br>
+                    {{ errorMessage }}
+                </p>
             <div v-if="fetchingColls" class="loader">Loading...</div>
             <div v-show="!fetchingColls" @click="jsonClick" ref="jsonDiv" id="json"></div>
         </div>
@@ -13,6 +24,9 @@ export default {
     setup() {
         const store = useStore()
         const jsonDiv = ref()
+        const jsonFile = ref()
+        const errorMessage = ref('')
+        const isImporting = ref(false)
         const activeColl = computed(() => store.state.activeColl)
         const collection = computed(() => store.state.collections)
         const fetchingColls = computed(() => store.state.fetchingColls)
@@ -26,7 +40,7 @@ export default {
             }, 0);
         }
         
-        // rerender on collection change
+        // re-render on collection change
         watch([activeColl, collection], () => {
             renderJson(store.getters.activeCollection)
         })
@@ -61,7 +75,10 @@ export default {
             // clicked delete icon
             let clickedDelete = e.target.classList[0] === 'delete-x'
             setTimeout(() => {
-                clickedDelete && store.commit('setOpenModal', true)
+                clickedDelete && store.commit('setModal', {
+                    isOpen: true,
+                    header: 'Delete <br>' + id
+                })
             }, 0);
 
             // edit field
@@ -76,11 +93,70 @@ export default {
             // }
         }
 
+        const importJSON = async () => {
+            errorMessage.value = ''
+            isImporting.value = true
+
+            if(jsonFile.value.files.length < 1) {
+                setTimeout(() => {
+                    isImporting.value = false
+                }, 150)
+                return
+            }
+
+            let formData = new FormData();
+
+            for(let file of jsonFile.value.files) {
+               formData.append('files', file, file.name);
+            }
+            
+            let res = await fetch('/rest/' + store.state.activeColl, {
+               method: 'POST',
+               body: formData
+            });
+
+            isImporting.value = false
+            
+            if(res.status == 500) {
+                errorMessage.value = await res.text()
+            } else {
+                location.reload()
+            }
+                
+            console.log(res, await res.text());
+        }
+
+        const openDropCollModal = () => {
+            store.commit('setModal', {
+                isOpen: true,
+                header: 'Drop ' + store.state.activeColl
+            })
+        }
+
+        const exportJSON = async () => {
+            let blob = await fetch('/api/export-collection/' + store.state.activeColl)
+            blob = await blob.blob()
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = store.state.activeColl + '.json';
+            document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+            a.click();    
+            a.remove();  //afterwards we remove the element again   
+            URL.revokeObjectURL(url); // prevent memory leak
+        }
+
         return {
             activeColl,
             jsonDiv,
+            jsonFile,
             jsonClick,
-            fetchingColls
+            importJSON,
+            exportJSON,
+            fetchingColls,
+            errorMessage,
+            isImporting,
+            openDropCollModal
         }
     }
 }

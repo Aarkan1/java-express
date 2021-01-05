@@ -6,14 +6,14 @@ app.get("/", (req, res) -> {
    res.send("Hello World");
 });
 
-app.listen(); // Will listen on port 80 which is set as default
+app.listen(3000); // Will listen on port 3000
 ```
 
 ## Installation
 
 ### Download
 **Direct download as jar:** 
-[Latest java-express-1.0.5.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.5.jar)
+[Latest java-express-1.0.6.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.6.jar)
 
 **Old version:**
 [Older versions](https://github.com/Aarkan1/java-express/tree/master/releases)
@@ -32,7 +32,7 @@ app.listen(); // Will listen on port 80 which is set as default
 <dependency>
     <groupId>com.github.Aarkan1</groupId>
     <artifactId>java-express</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Aarkan1:java-express:1.0.5'
+    implementation 'com.github.Aarkan1:java-express:1.0.6'
 }
 ```
 

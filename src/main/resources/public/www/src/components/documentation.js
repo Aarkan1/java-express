@@ -17,21 +17,7 @@ export default {
             <li>Observable store</li>
             </ul>
             <p><em>Requires Java Express version 0.5.0 and above!</em></p>
-            <h2 id="table-of-content">Table of content</h2>
-            <ul>
-                <li><a href="#getting-started">Getting started</a></li>
-                <li><a href="#collectionoptions">CollectionOptions</a></li>
-                <ul>
-                    <li><a href="#important-note">Important note!</a></li>
-                </ul>
-                <li><a href="#annotations">Annotations</a></li>
-                <li><a href="#collection-methods">Collection methods</a></li>
-                <ul>
-                    <li><a href="#filters">Filters</a></li>
-                    <li><a href="#findoptions">FindOptions</a></li>
-                </ul>
-                <li><a href="#examples">Examples</a></li>
-            </ul>
+            
             <h2 id="getting-started">Getting started</h2>
             <p>The Express app has an embedded nosql database, ready to be used if you enable it by adding <code>app.enableCollections()</code> right after app is instantiated. 
             This will create a database-file in your project, and is easy to deploy or share.
@@ -162,13 +148,28 @@ Options available are:</p>
 <span class="hljs-title">app</span>.<span class="hljs-title">enableCollections</span>(<span class="hljs-type">CollectionOptions</span>.<span class="hljs-type">DISABLE_BROWSER</span>);</span>
 </code></pre>
 
+<h2 id="import">Import</h2>
+<p>The collection supports mocking data as JSON, from example <a href="https://www.mockaroo.com/">mockaroo.com</a>.
+<br><strong>Note</strong>: Format must be a JSON-array. </p>
+<p>Simply select a .json-file and click <code>import</code>. This will append the data to the collection. 
+It&#39;s important that the fields match the <strong>model</strong> in the collection.</p>
+
+<h2 id="export">Export</h2>
+<p>Export will download the current collection as a .json-file.</p>
+<p>This file can easily be used to import into the collection, and can serve as a backup.</p>
+<p>The .json-file is also created in the db-directory with the name of the model. </p>
+<h2 id="drop">Drop</h2>
+<p>Will delete all data in the collection.</p>
+
+<br>
+
             <div class="important-div">
                 <h3 id="important-note">Important note!</h3>
                 <p>After a model is saved to the collection, the class with <strong>@Model</strong> annotation <strong>CANNOT</strong> be moved to another package or renamed. This will corrupt the database-file, and will have to be removed. 
                 Keep backups!</p>
                 <p>Changing the name of a field will not corrupt the database, but will remove the value from all models.</p>
             </div>
-            <h2 id="annotations">Annotations</h2>
+            <h2 id="model">Model</h2>
             <p>For the collections to work the following two annotations must be present in at least one class.</p>
             <h3 id="-model-annotation">@Model Annotation</h3>
             <p>Marks a class to be used with a collection. Is required if an object is going to be saved to the collection.</p>

@@ -7,13 +7,17 @@ const state = {
     collections: {},
     activeObjectId: '',
     activeObject: {},
-    openModal: false,
+    openModal: {
+        isOpen: false,
+        header: ''
+    },
+    openDropCollModal: false,
     fetchingColls: false
 }
 
 const mutations = {
-    setOpenModal(state, open) {
-        state.openModal = open
+    setModal(state, modal) {
+        state.openModal = modal
     },
     setFetchingColls(state, isFetching) {
         state.fetchingColls = isFetching

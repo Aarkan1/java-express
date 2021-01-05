@@ -1,8 +1,11 @@
 package express.database;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import express.Express;
 import express.database.exceptions.DatabaseNotEnabledException;
 import express.database.exceptions.ModelsNotFoundException;
+import io.javalin.http.UploadedFile;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.WsContext;
 import org.dizitart.no2.Nitrite;
@@ -10,7 +13,9 @@ import org.dizitart.no2.objects.Id;
 import org.reflections8.Reflections;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -99,13 +104,14 @@ public class Database {
 
         Reflections reflections = new Reflections();
         Set<Class<?>> klasses = reflections.getTypesAnnotatedWith(Model.class);
-        Set<String> collNames = klasses.stream().map(Class::getSimpleName).collect(Collectors.toSet());
+        Map<String, Class<?>> collNames = new HashMap<>();
         Map<String, String> idFields = new HashMap<>();
 
         if(klasses.isEmpty()) throw new ModelsNotFoundException("Must have a class with @Model to use embedded database.");
 
         klasses.forEach(klass -> {
             String klassName = klass.getSimpleName();
+
             for(Field field : klass.getDeclaredFields()) {
                 if(field.isAnnotationPresent(Id.class)) {
                     idFields.putIfAbsent(klassName, field.getName());
@@ -113,6 +119,7 @@ public class Database {
                 }
             }
 
+            collNames.putIfAbsent(klassName, klass);
             collections.putIfAbsent(klassName, new Collection(db.getRepository(klass), klass, idFields.get(klassName)));
         });
 
@@ -129,10 +136,10 @@ public class Database {
     /**
      * Embedded server to browse collections locally
      */
-    private static void initBrowser(Set<String> collNames, Map<String, String> idFields) {
+    private static void initBrowser(Map<String, Class<?>> collNames, Map<String, String> idFields) {
         express = new Express();
 
-        express.get("/rest/collNames", (req, res) -> res.json(collNames));
+        express.get("/rest/collNames", (req, res) -> res.json(collNames.keySet()));
 
         express.get("/rest/:coll", (req, res) -> {
             String coll = req.params("coll");
@@ -148,9 +155,51 @@ public class Database {
             res.send("OK");
         });
 
+        // route to handle json mockdata imports
+        express.post("/rest/:coll", (req, res) -> {
+            UploadedFile file = req.formDataFile("files");
+            ObjectMapper mapper = new ObjectMapper();
+            Object[] objects = mapper.readValue(file.getContent(), Object[].class);
+            Class klass = collNames.get(req.params("coll"));
+            List models = new ArrayList();
+            try {
+                for(Object obj : objects) models.add(mapper.readValue(mapper.writeValueAsBytes(obj), klass));
+            } catch (UnrecognizedPropertyException e) {
+                e.printStackTrace();
+                res.status(500).stop(e.getMessage());
+            }
+            res.json(collection(klass).save(models));
+        });
+
+        express.delete("/api/drop-collection/:coll", (req, res) -> {
+            res.send(collection(req.params("coll")).delete());
+        });
+
+        express.get("/api/export-collection/:coll", (req, res) -> {
+            File directory = new File(Paths.get("db").toString());
+            if (! directory.exists()){
+                directory.mkdir();
+            }
+            String coll = req.params("coll");
+            List models = collection(coll).find();
+            String path = Paths.get("db/" + coll + ".json").toString();
+            File file = new File(path);
+            if(file.exists()) file.delete();
+            new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(new File(path), models);
+            res.sendFile(Paths.get("db/" + coll + ".json"));
+        });
+
         express.useStatic("/public", Location.CLASSPATH);
 
         express.listen(9595);
+    }
+
+    private static <T> T castToType(Object obj, Class<T> klass) {
+        return (T) obj;
+    }
+
+    private static <T> T saveImport(Object obj, Class<T> klass) {
+        return collection(klass).save(obj);
     }
 
     private static void closeBrowser() {
@@ -180,11 +229,11 @@ public class Database {
         }
     }
 
-    private static void watchCollections(Set<String> collNames) {
+    private static void watchCollections(Map<String, Class<?>> collNames) {
         app.ws("/watch-collections", ws -> {
             ws.onConnect(ctx -> clients.add(ctx));
             ws.onClose(ctx -> clients.remove(ctx));
-            collNames.forEach(coll ->
+            collNames.keySet().forEach(coll ->
                 collection(coll).watch(watchData ->
                     clients.stream().filter(client -> client.session.isOpen())
                     .forEach(client -> client.send(watchData))

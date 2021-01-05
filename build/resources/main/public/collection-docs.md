@@ -17,8 +17,11 @@ Collection is a server-less embedded database ideal for small web applications. 
 ## Table of content
 - [Getting started](#getting-started)
 - [CollectionOptions](#collectionoptions)
+- [Import](#import)
+- [Export](#export)
+- [Drop](#drop)
     - [Important note!](#important-note)
-- [Annotations](#annotations)
+- [Model](#model)
 - [Collection methods](#collection-methods)
     - [Filters](#filters)
     - [FindOptions](#findoptions)
@@ -169,6 +172,22 @@ Express app = new Express();
 app.enableCollections(CollectionOptions.DISABLE_BROWSER);
 ```
 
+## Import
+The collection supports mocking data as JSON, from example [mockaroo.com](https://www.mockaroo.com/).
+**Note**: Format must be a JSON-array. 
+
+Simply select a .json-file and click `import`. This will append the data to the collection. 
+It's important that the fields match the **model** in the collection.
+
+## Export
+Export will download the current collection as a .json-file.
+
+This file can easily be used to import into the collection, and can serve as a backup.
+
+The .json-file is also created in the db-directory with the name of the model. 
+
+## Drop
+Will delete all data in the collection.
 
 ### Important note!
 After a model is saved to the collection, the class with **@Model** annotation **CANNOT** be moved to another package or renamed. This will corrupt the database-file, and will have to be removed. 
@@ -176,7 +195,7 @@ Keep backups!
 
 Changing the name of a field will not corrupt the database, but will remove the value from all models.
 
-## Annotations
+## Model
 For the collections to work the following two annotations must be present in at least one class.
 
 ### @Model Annotation

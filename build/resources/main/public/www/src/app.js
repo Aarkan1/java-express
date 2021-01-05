@@ -15,6 +15,23 @@ export default {
         </header>
         <sidebar :displayCollections="displayCollections">
             <button v-for="item in pages" :key="item.name" @click="routeTo(item.name)">{{ item.name }}</button>
+            <ul v-if="page == 'documentation'">
+                <li><a href="#getting-started">Getting started</a></li>
+                <li><a href="#collectionoptions">CollectionOptions</a></li>
+                <li><a href="#import">Import</a></li>
+                <li><a href="#export">Export</a></li>
+                <li><a href="#drop">Drop</a></li>
+                <ul>
+                    <li><a href="#important-note">Important note!</a></li>
+                </ul>
+                <li><a href="#model">Model</a></li>
+                <li><a href="#collection-methods">Collection methods</a></li>
+                <ul>
+                    <li><a href="#filters">Filters</a></li>
+                    <li><a href="#findoptions">FindOptions</a></li>
+                </ul>
+                <li><a href="#examples">Examples</a></li>
+            </ul>
             <button @click="routeTo()">Collections</button>
         </sidebar>
         <main>
