@@ -73,7 +73,7 @@ This class represents the entire HTTP-Server.
 <details>
     <summary><strong>Show documentation</strong></summary>
 
-    ```java
+```java
 app.raw()                                               // 
 app.enableCollections()                                 // 
 app.enableCollections(String dbPath)                    // 
@@ -109,7 +109,8 @@ app.listen()                                            //
 app.listen(int port)                                    // 
 app.listen(String hostname, int port)                   // 
 app.stop()                                              // 
-    ```
+```
+
 </details>
 
 
@@ -175,6 +176,7 @@ req.session()                            //
 req.session(String key)                  // 
 req.session(String key, Object value)    // 
 ```
+
 </details>
 
 ## Response
@@ -219,6 +221,7 @@ res.type(String contentType)                       //
 res.stop()                                         // 
 res.stop(String text)                              // 
 ```
+
 </details>
 
 ## Collection
@@ -693,9 +696,9 @@ Uploaded files are easily accessible via `req.formDataFile()`:
 <details>
     <summary><strong>Show documentation</strong></summary>
 
-    Java endpoint:
+Java endpoint:
 
-    ```java
+```java
 app.post("/api/upload", (req, res) -> {
     List<UploadedFile> files = req.formDataFiles("files");  // get files as list
     UploadedFile file = req.formDataFile("files");          // get a single file
@@ -709,11 +712,11 @@ app.post("/api/upload", (req, res) -> {
     // with FileUtil (creates dirs if necessary)
     FileUtil.streamToFile(file.getContent(), "src/uploads/" + file.getFilename());
 });
-    ```
+```
 
-    JavaScript:
+JavaScript:
 
-    ```js
+```js
 let files = document.querySelector('input[type=file]').files;
 let formData = new FormData();
 
@@ -725,16 +728,16 @@ fetch('/api/upload', {
    method: 'POST',
    body: formData
 });
-    ```
+```
 
-    or with HTML:
+or with HTML:
 
-    ```html
+```html
 <form method="post" action="/api/upload" enctype="multipart/form-data">
     <input type="file" name="files" multiple>
     <button>Submit</button>
 </form>
-    ```
+```
     
 </details>
 
@@ -762,9 +765,9 @@ ws.onBinaryMessage(WsBinaryMessageContext);
 <details>
     <summary><strong>Show documentation</strong></summary>
     
-    A WebSocket endpoint is declared with app.ws(path, handler). WebSocket handlers require unique paths.
+A WebSocket endpoint is declared with app.ws(path, handler). WebSocket handlers require unique paths.
 
-    ```java
+```java
 app.ws("/websocket/:path", ws -> {
     ws.onConnect(ctx -> System.out.println("Connected"));
     ws.onMessage(ctx -> {
@@ -775,13 +778,13 @@ app.ws("/websocket/:path", ws -> {
     ws.onClose(ctx -> System.out.println("Closed"));
     ws.onError(ctx -> System.out.println("Errored"));
 });
-    ```
+```
 
-    ### WsContext (ctx)
+### WsContext (ctx)
 
-    The Context object provides you with everything you need to handle a websocket-request. It contains the underlying websocket session and servlet-request, and convenience methods for sending messages to the client.
+The Context object provides you with everything you need to handle a websocket-request. It contains the underlying websocket session and servlet-request, and convenience methods for sending messages to the client.
 
-    ```java
+```java
 // WsMessageContext
 ctx.message()                // get the message as String
 ctx.message(MyObject.class)  // get message as target class (T)
@@ -830,7 +833,7 @@ ctx.reason() // String or null (String?)
 
 // WsErrorContext
 ctx.error() // Throwable or null (Throwable?)
-    ```
+```
 
 </details>
 
@@ -842,20 +845,20 @@ Server-sent events (often also called event source) are very simple in Javalin. 
 <details>
     <summary><strong>Show documentation</strong></summary>
 
-    ```java
+```java
 app.sse("/sse", client ->
     client.sendEvent("connected", "Hello, SSE");
     client.onClose(() -> System.out.println("Client disconnected"));
 });
-    ```
+```
 
-    The `SseClient` has access to three things:
+The `SseClient` has access to three things:
 
-    ```java
+```java
 client.sendEvent() // method(s) for sending events to client
 client.onClose(runnable) // callback which runs when a client closes its connection
 client.ctx // the Context for when the client connected (to fetch query-params, etc)
-    ```
+```
     
 </details>
 
@@ -867,7 +870,7 @@ You can pass a config object when creating a new instance of Express. The below 
 <details>
     <summary><strong>Show documentation</strong></summary>
 
-    ```java
+```java
 Express app = new Express(config -> {
 
     // JavalinServlet
@@ -907,7 +910,8 @@ Express app = new Express(config -> {
     // Misc
     config.accessManager { ... }                    // set an access manager (affects both http and websockets)
 });
-    ```
+```
+
 </details>
 
 ## Examples
