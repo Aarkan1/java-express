@@ -159,7 +159,7 @@ public class Database {
                 for(Object obj : objects) models.add(mapper.readValue(mapper.writeValueAsBytes(obj), klass));
             } catch (UnrecognizedPropertyException e) {
                 logger.log(Level.WARNING, "Could not convert JSON.", e);
-                res.status(500).stop(e.getMessage());
+                res.status(500).end(e.getMessage());
             }
             res.json(collection(klass).save(models));
         });

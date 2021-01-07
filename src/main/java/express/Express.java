@@ -6,6 +6,7 @@ import express.http.HttpContextHandler;
 import express.http.Request;
 import express.http.Response;
 import io.javalin.Javalin;
+import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.core.JavalinConfig;
 import io.javalin.http.sse.SseClient;
 import io.javalin.http.staticfiles.Location;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 /**
  * The Express layer on top of Javalin
@@ -248,13 +251,12 @@ public class Express {
 
     public void stop() { app.stop(); }
 
+//    public Express route(String path, EndpointGroup endpointGroup) {
+//        app.routes(() -> path(path, endpointGroup));
+//        return this;
+//    }
 
-//    public Express mountpath() { return this; }
 //    public Express param() { return this; }
-//    public Express route() { return this; }
-//    public Express router() { return this; }
-//    public Express mount() { return this; }
-//    public Express engine() { return this; }
 //    public Express path() { return this; }
 //    public Express render() { return this; }
 

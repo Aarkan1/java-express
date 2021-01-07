@@ -3,7 +3,7 @@ apply plugin: 'idea'
 apply plugin: 'maven'
 
 group 'org.express'
-version '1.0.6'
+version '1.0.7'
 
 jar {
     from {
@@ -25,4 +25,5 @@ dependencies {
     compile 'net.oneandone.reflections8:reflections8:0.11.7'
     compile 'org.slf4j:slf4j-simple:1.7.28'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.12.0-rc1'
+    compile 'com.aventrix.jnanoid:jnanoid:2.0.0'
 }
