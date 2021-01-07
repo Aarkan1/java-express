@@ -38,7 +38,7 @@ app.listen(4000); // Will listen on port 4000
 
 ### Gradle
 > Add this to your build.gradle
-```xml
+```golang
 repositories {
     maven { url "https://jitpack.io/" }
 }
