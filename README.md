@@ -13,7 +13,7 @@ app.listen(4000); // Will listen on port 4000
 
 ### Download
 **Direct download as jar:** 
-[Latest java-express-1.0.8.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.8.jar)
+[Latest java-express-1.0.9.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.9.jar)
 
 **Old version:**
 [Older versions](https://github.com/Aarkan1/java-express/tree/master/releases)
@@ -32,19 +32,19 @@ app.listen(4000); // Will listen on port 4000
 <dependency>
     <groupId>com.github.Aarkan1</groupId>
     <artifactId>java-express</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 </dependency>
 ```
 
 ### Gradle
 > Add this to your build.gradle
-```xml
+```golang
 repositories {
     maven { url "https://jitpack.io/" }
 }
 
 dependencies {
-    implementation 'com.github.Aarkan1:java-express:1.0.8'
+    implementation 'com.github.Aarkan1:java-express:1.0.9'
 }
 ```
 
