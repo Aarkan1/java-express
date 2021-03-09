@@ -1,5 +1,6 @@
 package express.database;
 
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import org.dizitart.no2.FindOptions;
 import org.dizitart.no2.RemoveOptions;
 import org.dizitart.no2.event.ChangedItem;
@@ -170,7 +171,7 @@ public class Collection {
                 Field field = model.getClass().getDeclaredField(idField);
                 field.setAccessible(true);
                 if(field.get(model) == null) {
-                    field.set(model, UUID.randomUUID().toString());
+                    field.set(model, NanoIdUtils.randomNanoId());
                 }
                 idValues.putIfAbsent("name", field.getName());
                 idValues.putIfAbsent("id", (String) field.get(model));
@@ -183,7 +184,7 @@ public class Collection {
                     if(field.isAnnotationPresent(Id.class)) {
                         field.setAccessible(true);
                         if(field.get(model) == null) {
-                            field.set(model, UUID.randomUUID().toString());
+                            field.set(model, NanoIdUtils.randomNanoId());
                         }
                         idValues.putIfAbsent("name", field.getName());
                         idValues.putIfAbsent("id", (String) field.get(model));

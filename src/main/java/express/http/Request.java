@@ -50,16 +50,16 @@ public class Request {
     }
     public boolean xhr() { return ctx.header("X-Requested-With").equals("XMLHttpRequest"); }
     public boolean accepts(String accept) { return ctx.header("Accept").equals(accept); }
-    @Deprecated public String acceptsCharsets() { return ctx.header("Accept-Charset"); }
-    @Deprecated public String acceptsEncodings() { return ctx.header("Accept-Encoding"); }
-    @Deprecated public String acceptsLanguages() { return ctx.header("Accept-Language"); }
     public String get(String header) { return ctx.header(header); }
-    public String header(String field) { return ctx.header(field); }
     public boolean is(String contentType) { return ctx.contentType().equals(contentType); }
     public <T> Map<String, T> session() { return ctx.sessionAttributeMap(); }
     public <T> T session(String key) { return ctx.sessionAttribute(key); }
     public void session(String key, Object value) { ctx.sessionAttribute(key, value); }
 
+//    public String header(String field) { return ctx.header(field); }
+//    public String acceptsCharsets() { return ctx.header("Accept-Charset"); }
+//    public String acceptsEncodings() { return ctx.header("Accept-Encoding"); }
+//    public String acceptsLanguages() { return ctx.header("Accept-Language"); }
 //    public void route() {  }
 //    public void stale() {  }
 //    public void signedCookies() {  }

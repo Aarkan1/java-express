@@ -6,7 +6,6 @@ import express.Express;
 import express.JavalinUtil;
 import express.database.exceptions.DatabaseNotEnabledException;
 import express.database.exceptions.ModelsNotFoundException;
-import io.javalin.Javalin;
 import io.javalin.http.UploadedFile;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.WsContext;
@@ -19,8 +18,6 @@ import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Johan Wirén
@@ -158,7 +155,7 @@ public class Database {
                 for(Object obj : objects) models.add(mapper.readValue(mapper.writeValueAsBytes(obj), klass));
             } catch (UnrecognizedPropertyException e) {
                 Express.log.info("Could not convert JSON.", e);
-                res.status(500).stop(e.getMessage());
+                res.status(500).end(e.getMessage());
             }
             res.json(collection(klass).save(models));
         });

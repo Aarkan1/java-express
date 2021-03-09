@@ -66,14 +66,13 @@ public class Response {
     public Response cookie(String name, String value) { ctx.cookie(name, value); return this; }
     public Response cookie(Cookie cookie) { ctx.cookie(cookie); return this; }
     public Response clearCookie(String name, String path) { ctx.removeCookie(name, path); return this; }
-    public Response end() { ctx.result(""); return this; }
-    public String get() { return ctx.contentType(); }
+    public String get(String key) { return ctx.header(key); }
     public String links() { return ctx.header("Link"); }
     public Response links(String next, String last) { ctx.header("Link", String.format("<%s>; rel=\"next\",\n<%s>; rel=\"last\"", next, last)); return this; }
     public String location() { return ctx.header("Location"); }
     public Response location(String location) { ctx.header("Location", location); return this; }
     public Response redirect(String location) { ctx.redirect(location); return this; }
-    public Response redirect(String location, int httpStatusCode) { ctx.redirect(location, httpStatusCode); return this; }
+    public Response redirect(int httpStatusCode, String location) { ctx.redirect(location, httpStatusCode); return this; }
     public Response render(String filePath, Map<String, Object> model) { ctx.render(filePath, model); return this; }
     public Response sendStatus(int statusCode) { status(statusCode).send(Status.valueOf(statusCode).getDescription()); return this; }
     public Response set(String name, String value) { ctx.header(name, value); return this; }
@@ -86,45 +85,43 @@ public class Response {
         return this;
     }
 
+    public void end() { end(null); }
 
-    public void stop() { stop(null); }
-
-    public void stop(String text) {
+    public void end(String message) {
         switch (status()) {
             case 302:
                 throw new RedirectResponse();
             case 400:
-                throw new BadRequestResponse(text == null ? "BadRequest" : text);
+                throw new BadRequestResponse(message == null ? "BadRequest" : message);
             case 401:
-                throw new UnauthorizedResponse(text == null ? "Unauthorized" : text);
+                throw new UnauthorizedResponse(message == null ? "Unauthorized" : message);
             case 403:
-                throw new ForbiddenResponse(text == null ? "Forbidden" : text);
+                throw new ForbiddenResponse(message == null ? "Forbidden" : message);
             case 404:
-                throw new NotFoundResponse(text == null ? "NotFound" : text);
+                throw new NotFoundResponse(message == null ? "NotFound" : message);
             case 405:
                 Map<String, String> details = new HashMap<>();
                 details.put("method", ctx.method());
-                throw new MethodNotAllowedResponse(text == null ? "MethodNotAllowed" : text, details);
+                throw new MethodNotAllowedResponse(message == null ? "MethodNotAllowed" : message, details);
             case 409:
-                throw new ConflictResponse(text == null ? "Conflict" : text);
+                throw new ConflictResponse(message == null ? "Conflict" : message);
             case 410:
-                throw new GoneResponse(text == null ? "Gone" : text);
+                throw new GoneResponse(message == null ? "Gone" : message);
             case 500:
-                throw new InternalServerErrorResponse(text == null ? "InternalServerError" : text);
+                throw new InternalServerErrorResponse(message == null ? "InternalServerError" : message);
             case 502:
-                throw new BadGatewayResponse(text == null ? "BadGateway" : text);
+                throw new BadGatewayResponse(message == null ? "BadGateway" : message);
             case 503:
-                throw new ServiceUnavailableResponse(text == null ? "ServiceUnavailable" : text);
+                throw new ServiceUnavailableResponse(message == null ? "ServiceUnavailable" : message);
             case 504:
-                throw new GatewayTimeoutResponse(text == null ? "GatewayTimeout" : text);
+                throw new GatewayTimeoutResponse(message == null ? "GatewayTimeout" : message);
             default:
                 Map<String, String> det = new HashMap<>();
-                throw new HttpResponseException(status(), text == null ? "NoResponse" : text, det);
+                throw new HttpResponseException(status(), message == null ? "NoResponse" : message, det);
         }
     }
 
 //    public Response headersSent() {  }
 //    public Response format() {  }
-//    public Response locals() {  }
 //    public Response vary() {  }
 }

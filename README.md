@@ -6,14 +6,14 @@ app.get("/", (req, res) -> {
    res.send("Hello World");
 });
 
-app.listen(3000); // Will listen on port 3000
+app.listen(4000); // Will listen on port 4000
 ```
 
 # Installation
 
 ### Download
 **Direct download as jar:** 
-[Latest java-express-1.0.7.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.7.jar)
+[Latest java-express-1.0.12.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.12.jar)
 
 **Old version:**
 [Older versions](https://github.com/Aarkan1/java-express/tree/master/releases)
@@ -32,19 +32,19 @@ app.listen(3000); // Will listen on port 3000
 <dependency>
     <groupId>com.github.Aarkan1</groupId>
     <artifactId>java-express</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.12</version>
 </dependency>
 ```
 
 ### Gradle
 > Add this to your build.gradle
-```xml
+```golang
 repositories {
     maven { url "https://jitpack.io/" }
 }
 
 dependencies {
-    implementation 'com.github.Aarkan1:java-express:1.0.7'
+    implementation 'com.github.Aarkan1:java-express:1.0.12'
 }
 ```
 
@@ -66,6 +66,11 @@ See [Javalin api documentation](https://javalin.io/documentation).
 - [Server-sent Events](#server-sent-events)
 - [Configuration](#configuration)
 - [Examples](#examples)
+    - Very simple static-website
+    - CRUD with embedded Collection database
+    - File upload
+    - Send cookies
+    - File download
 
 ## Express
 This class represents the entire HTTP-Server.
@@ -74,41 +79,41 @@ This class represents the entire HTTP-Server.
     <summary><strong>Show documentation</strong></summary>
 
 ```java
-app.raw()                                               // 
-app.enableCollections()                                 // 
-app.enableCollections(String dbPath)                    // 
-app.enableCollections(CollectionOptions... options)     // 
-app.enableCollections(String dbPath, CollectionOptions... options)   //
-app.useStatic(Path path)                                // 
-app.useStatic(String path, Location location)           // 
-app.useStaticFallback(String url, Path filePath)        // 
-app.useStaticFallback(String url, String filePath, Location location) //
-app.cors()                                              // 
-app.cors(String origin)                                 // 
-app.devLogging()                                        // 
-app.put(String path, (req, res) -> { })                 // 
-app.get(String path, (req, res) -> { })                 // 
-app.post(String path, (req, res) -> { })                // 
-app.patch(String path, (req, res) -> { })               // 
-app.delete(String path, (req, res) -> { })              // 
-app.use((req, res) -> { })                              // 
-app.use(String path, (req, res) -> { })                 // 
-app.all(String path, (req, res) -> { })                 // 
-app.sse(String path, client -> { })                     // 
-app.ws(String path, ws -> { })                          // 
-app.locals()                                            // 
-app.locals(String name)                                 // 
-app.locals(String name, Object obj)                     // 
-app.enable(String name)                                 // 
-app.disable(String name)                                // 
-app.enabled(String name)                                // 
-app.disabled(String name)                               // 
-app.set(String name, Object obj)                        // 
-app.get(String name)                                    // 
-app.listen()                                            // 
-app.listen(int port)                                    // 
-app.listen(String hostname, int port)                   // 
-app.stop()                                              // 
+app.raw()                                               // The Javalin app this Express is built upon
+app.enableCollections()                                 // Enables the embedded document database
+app.enableCollections(String dbPath)                    // Enables the database and creates db on target path
+app.enableCollections(CollectionOptions... options)     // Enables the database with options
+app.enableCollections(String dbPath, CollectionOptions... options) // Enables the database with options and creates db on target path
+app.useStatic(Path path)                                // Serves static files from target directory
+app.useStatic(String path, Location location)           // Serves static files from target directory in classpath (Location.CLASSPATH)
+app.useStaticFallback(String url, Path filePath)        // Route 404's to target file, good for SPA's
+app.useStaticFallback(String url, String filePath, Location location) // Route 404's to target file in classpath (Location.CLASSPATH)
+app.cors()                                              // Enable cors for all origins
+app.cors(String origin)                                 // Enable cors for specific origins
+app.devLogging()                                        // Use extensive logging on handlers
+app.get(String path, (req, res) -> { })                 // Add a GET request handler
+app.post(String path, (req, res) -> { })                // Add a POST request handler
+app.put(String path, (req, res) -> { })                 // Add a PUT request handler
+app.patch(String path, (req, res) -> { })               // Add a PATCH request handler
+app.delete(String path, (req, res) -> { })              // Add a DELETE request handler
+app.use((req, res) -> { })                              // Add a middleware for all methods
+app.use(String path, (req, res) -> { })                 // Add a middleware for all methods on specified path
+app.all(String path, (req, res) -> { })                 // Add a handler for all methods
+app.sse(String path, client -> { })                     // Add a handler for Server Side Events
+app.ws(String path, ws -> { })                          // Add a handler for WebSockets
+app.locals()                                            // Get environment variables as a Map
+app.locals(String name)                                 // Get an environment variable
+app.locals(String name, Object obj)                     // Set an environment variable
+app.enable(String name)                                 // Set an environment variable to true
+app.disable(String name)                                // Set an environment variable to false
+app.enabled(String name)                                // Get if environment variable is enabled as a boolean
+app.disabled(String name)                               // Get if environment variable is disabled as a boolean
+app.get(String name)                                    // Get an environment variable (same as locals)
+app.set(String name, Object obj)                        // Set an environment variable (same as locals)
+app.listen()                                            // Start the async server on port 80
+app.listen(int port)                                    // Start the async server on an specific port
+app.listen(String hostname, int port)                   // Start the async server on an specific hostname and port
+app.stop()                                              // Stop the server
 ```
 
 </details>
@@ -137,44 +142,40 @@ app.get('/user/:id', (request, response) -> {
     <summary><strong>Show documentation</strong></summary>
 
 ```java
-req.ctx()                                // 
-req.baseUrl()                            // 
-req.body()                               // 
-req.body(Class<T> klass)                 // 
-req.bodyAsBytes()                        // 
-req.cookie(String name)                  // 
-req.cookies()                            // 
-req.host()                               // 
-req.hostname()                           // 
-req.ip()                                 // 
-req.method()                             // 
-req.originalUrl()                        // 
-req.params()                             // 
-req.params(String key)                   // 
-req.params(String key, Class<T> klass)   // 
-req.path()                               // 
-req.protocol()                           // 
-req.query()                              // 
-req.query(String key)                    // 
-req.query(String key, Class<T> klass)    // 
-req.formData()                           // 
-req.formData(String key)                 // 
-req.formData(String key, Class<T> klass) // 
-req.formDataFile(String key)             // 
-req.formDataFiles(String key)            // 
-req.secure()                             // 
-req.subdomains()                         // 
-req.xhr()                                // 
-req.accepts(String accept)               // 
-req.acceptsCharsets()                    // 
-req.acceptsEncodings()                   // 
-req.acceptsLanguages()                   // 
-req.get(String header)                   // 
-req.header(String field)                 // 
-req.is(String contentType)               // 
-req.session()                            // 
-req.session(String key)                  // 
-req.session(String key, Object value)    // 
+req.ctx()                                    // The Javalin context object which this Request is built upon
+req.baseUrl()                                // The URL path on which a router instance was mounted
+req.body()                                   // Returns body as a Map (consumes underlying request body if not cached)
+req.body(Class<T> klass)                     // Returns body as a class (consumes underlying request body if not cached)
+req.bodyAsBytes()                            // Returns body as a bytes (consumes underlying request body if not cached)
+req.cookie(String name)                      // Returns an cookie by its name
+req.cookies()                                // Returns all cookies
+req.host()                                   // Returns host url "example.com"
+req.hostname()                               // Returns host url with port "example.com:4000"
+req.ip()                                     // Contains the remote IP address of the request
+req.method()                                 // Contains a string corresponding to the HTTP method of the request: GET, POST, PUT, and so on
+req.originalUrl()                            // This property is much like req.url; however, it retains the original request URL "/search?q=something"
+req.params()                                 // Returns all params
+req.params(String key)                       // Returns the url parameter by name
+req.params(String key, Class<T> klass)       // Returns the url parameter by name as class
+req.path()                                   // Returns the request path
+req.protocol()                               // Returns the connection protocol
+req.query()                                  // Returns all querys
+req.query(String key)                        // Returns all querys by name
+req.query(String key, Class<T> klass)        // Returns all querys by name as class
+req.formData()                               // Returns all form values
+req.formData(String key)                     // Returns the form value by name
+req.formData(String key, Class<T> klass)     // Returns the form value by name as class
+req.formDataFile(String key)                 // Returns the form value file by name
+req.formDataFiles(String key)                // Returns multiple form value files by name
+req.secure()                                 // Returns true when the connection is over HTTPS, false otherwise
+req.subdomains()                             // An array of subdomains in the domain name of the request "tobi.ferrets.example.com" -> ["ferrets", "tobi"]
+req.xhr()                                    // Returns true if the 'X-Requested-With' header field is 'XMLHttpRequest'
+req.accepts(String accept)                   // Checks if the specified content types are acceptable
+req.get(String header)                       // Returns the specified HTTP request header field
+req.is(String contentType)                   // Returns the matching content type if the incoming request’s “Content-Type”
+req.session()                                // Returns session attributes as Map (server side attribute)
+req.session(String key)                      // Returns session attribute         (server side attribute)
+req.session(String key, Object value)        // Set session attribute             (server side attribute)
 ```
 
 </details>
@@ -190,36 +191,35 @@ See [Request example](#request).
     <summary><strong>Show documentation</strong></summary>
 
 ```java
-res.ctx()                                          // 
-res.send(String text)                              // 
-res.send(Object obj)                               // 
-res.send(InputStream stream)                       // 
-res.send(byte[] bytes)                             // 
-res.json(Object json)                              // 
-res.append(String name, String value)              // 
-res.attachment()                                   // 
-res.attachment(String path)                        // 
-res.download(Path path)                            // 
-res.sendFile(Path path)                            // 
-res.cookie(String name, String value)              // 
-res.cookie(Cookie cookie)                          // 
-res.clearCookie(String name, String path)          // 
-res.end()                                          // 
-res.get()                                          // 
-res.links()                                        // 
-res.links(String next, String last)                // 
-res.location()                                     // 
-res.location(String location)                      // 
-res.redirect(String location)                      // 
-res.redirect(String location, int httpStatusCode)  // 
-res.render(String filePath, Map<String, Object> model) // 
-res.sendStatus(int statusCode)                     // 
-res.set(String name, String value)                 // 
-res.status(int statusCode)                         // 
-res.status()                                       // 
-res.type(String contentType)                       // 
-res.stop()                                         // 
-res.stop(String text)                              // 
+res.ctx()                                          // The Javalin context object which this Response is built upon
+res.send(String text)                              // Send a string as response (text/html)
+res.send(Object obj)                               // Send an object as a json string response (text/plain)
+res.send(InputStream stream)                       // Send inputStream as response
+res.send(byte[] bytes)                             // Send bytes as response
+res.json(Object json)                              // Send object as JSON response (application/json)
+res.append(String name, String value)              // Appends the specified value to the HTTP response header field
+res.attachment()                                   // Sets the HTTP response "Content-Disposition" header field to “attachment”
+res.attachment(String path)                        // Sets "Content-Disposition" header field and sets the filename and Content-Type to target file
+res.download(Path path)                            // Sets attachment and transfers file from the given path
+res.sendFile(Path path)                            // Transfers the file from the given path
+res.cookie(String name, String value)              // Add a cookie to the response
+res.cookie(Cookie cookie)                          // Add a cookie to the response
+res.clearCookie(String name, String path)          // Clears the cookie specified by name
+res.get(String key)                                // Get the value from an header field via key
+res.links()                                        // Returns the header field "Link"
+res.links(String next, String last)                // Joins the links provided as properties of the parameter to populate the response’s Link HTTP header field
+res.location()                                     // Gets the response Location HTTP header
+res.location(String location)                      // Sets the response Location HTTP header to the specified path parameter
+res.redirect(String location)                      // Redirect the request to another url
+res.redirect(int httpStatusCode, String location)  // Redirect the request to another url with set status
+res.render(String filePath, Map<String, Object> model) // Calls send(JavalinRenderer.render(filePath, model) (text/html)
+res.sendStatus(int statusCode)                     // Set the response status and send an empty response
+res.set(String name, String value)                 // Set a specific response header
+res.status(int statusCode)                         // Set the response status
+res.status()                                       // Returns the current status
+res.type(String contentType)                       // Set the content type
+res.end()                                          // Ends the response process
+res.end(String message)                            // Ends the response process with message
 ```
 
 </details>
@@ -286,14 +286,14 @@ User john = new User("John").
 // generates an UUID
 collection("User").save(john); 
 
-User jane = collection("User").findById("xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx");
+User jane = collection("User").findById("lic4XCz2kxSOn4vr0D8BV");
 
 jane.setAge(30);
 // updates model with same UUID
 collection("User").save(jane); 
 
 // delete Jane
-collection("User").deleteById("xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx"); 
+collection("User").deleteById("lic4XCz2kxSOn4vr0D8BV"); 
 
 List<User> users = collection("User").find();
 List<User> users = collection(User.class).find();
@@ -346,7 +346,7 @@ This starts an `WebSocket` endpoint in the database that will send *watchData* w
 To listen to these events on the client you have to create a connection to `'ws://<hostname>:<port>/watch-collections'` with `WebSocket`.
 
 ```js
-let ws = new WebSocket('ws://localhost:3000/watch-collections')
+let ws = new WebSocket('ws://localhost:4000/watch-collections')
 ```
 
 With the webSocket you can listen to messages from the collection channel.
@@ -823,16 +823,16 @@ ctx.sessionAttribute(key)    // get request session attribute (from when WebSock
 ctx.sessionAttributeMap()    // get a map of session attributes (from when WebSocket upgrade was performed)
 
 // WsBinaryMessageContext
-ctx.data() // Byte[] (Array<Byte>)
-ctx.offset() // int (Int)
-ctx.length() // int (Int)
+ctx.data()                   // Byte[] (Array<Byte>)
+ctx.offset()                 // int (Int)
+ctx.length()                 // int (Int)
 
 // WsCloseContext
-ctx.status() // int (Int)
-ctx.reason() // String or null (String?)
+ctx.status()                 // int (Int)
+ctx.reason()                 // String or null (String?)
 
 // WsErrorContext
-ctx.error() // Throwable or null (Throwable?)
+ctx.error()                  // Throwable or null (Throwable?)
 ```
 
 </details>
@@ -916,8 +916,175 @@ Express app = new Express(config -> {
 
 ## Examples
 
+- Very simple static-website
+- CRUD with embedded Collection database
+- File upload
+- Send cookies
+- File download
+
 <details>
     <summary><strong>Show documentation</strong></summary>
+
+### Very simple static-website
+```java
+// Create instance
+Express app = new Express();
+
+// will serve both the html/css/js files and the uploads folder in target directory
+app.useStatic(Paths.get("src/www"));
+
+app.listen(4000); // start server on port 4000
+```
+
+### CRUD with embedded Collection database
+```java
+// Create instance
+Express app = new Express();
+// Enable collections before handlers
+app.enableCollections();
+
+// Get all articles
+app.get("/articles", (req, res) -> {
+   List<Article> articles = collection("Article").find();
+   res.json(articles);
+});
+
+// Get article with id param
+app.get("/articles/:id", (req, res) -> {
+   String articleId = req.params("id");
+   Article article = collection("Article").findById(articleId);
+   res.json(article);
+});
+
+// Create new article or update existing if existing 'id' is present,
+// and return same article with generated 'id' if it wasn't present
+app.post("/articles", (req, res) -> {
+   Article article = req.body(Article.class);
+   Article articleWithGeneratedId = collection("Article").save(article);
+   res.json(articleWithGeneratedId);
+});
+
+// Delete article with id param
+app.delete("/articles/:id", (req, res) -> {
+   String articleId = req.params("id");
+   int affectCount = collection("Article").deleteById(articleId);
+
+   if(affectCount > 0) {
+      res.send("Delete ok");
+   } else {
+      res.status(404).send("Could not delete article");
+   }
+});
+
+app.listen(4000); // start server on port 4000
+
+
+// Class tagged as a Model to be saved in the collection
+import express.database.Model;
+import org.dizitart.no2.objects.Id;
+
+@Model // required
+class Article {
+   @Id // required
+   private String id;
+   private String title;
+   private String content;
+
+   // getters, setters, etc..
+}
+```
+
+### File upload
+
+Server:
+
+```java
+// Create instance
+Express app = new Express();
+
+// Define endpoint to send formData with files
+app.post("/api/upload", (req, res) -> {
+   // Define list that will contain upload urls to send back to client
+   List<String> uploadNames = new ArrayList<>();
+   // extract the files from the FormData
+   List<UploadedFile> files = req.formDataFiles("files");
+
+   // loop files
+   for (FileItem file : files) {
+      // get filename and concat with upload folder name
+      String filename = "/uploads/" + file.getFilename();
+      // add upload filename to list
+      uploadNames.add(filename);
+      // save file to static directory (creates dirs if necessary)
+      FileUtil.streamToFile(file.getContent(), "src/www" + filename);
+   }
+
+   // return uploaded filenames to client
+   res.json(uploadNames);
+});
+```
+
+Client (JavaScript):
+
+```js
+async function uploadFiles(e) {
+    e.preventDefault();
+
+    // upload files with FormData
+    let files = document.querySelector('input[type=file]').files;
+
+    if(files.length) {
+        let formData = new FormData();
+        
+        // add files to formData
+        for(let file of files) {
+            formData.append('files', file, file.name);
+        }
+        
+        // upload selected files to server
+        let uploadResult = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        // get the uploaded file urls from response
+        let uploadNames = await uploadResult.json();
+    }
+}
+```
+
+### Send cookies
+```java
+// Create instance
+Express app = new Express();
+
+// Define route
+app.get("/give-me-cookies", (req, res) -> {
+
+   // Set an cookie (you can call res.cookie how often you want)
+   res.cookie(new Cookie("my-cookie", "Hello World!"));
+   
+   // Send text
+   res.send("Your cookie has been set!");
+});
+
+app.listen(4000); // start server on port 4000
+```
+
+### File download
+```java
+// Create instance
+Express app = new Express();
+
+// Your file
+Path downloadFile = Paths.get("my-big-file");
+
+// Create get-route where the file can be downloaded
+app.get("/download-me", (req, res) -> res.download(downloadFile));
+
+app.listen(4000); // start server on port 4000
+```
+
     
 </details>
 
