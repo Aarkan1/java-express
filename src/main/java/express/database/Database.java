@@ -3,8 +3,10 @@ package express.database;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import express.Express;
+import express.JavalinUtil;
 import express.database.exceptions.DatabaseNotEnabledException;
 import express.database.exceptions.ModelsNotFoundException;
+import io.javalin.Javalin;
 import io.javalin.http.UploadedFile;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.WsContext;
@@ -33,7 +35,6 @@ public class Database {
     private static boolean enabledDatabase = false;
     private static Express app;
     private static Express express;
-    private static Logger logger;
     private static boolean enableWatcher = false;
     private static boolean disableBrowser = false;
 
@@ -42,7 +43,7 @@ public class Database {
         try {
             init("db/embedded.db");
         } catch (ModelsNotFoundException e) {
-            e.printStackTrace();
+            Express.log.info("Model not found", e);
         }
     }
 
@@ -53,7 +54,7 @@ public class Database {
         try {
             init("db/embedded.db");
         } catch (ModelsNotFoundException e) {
-            e.printStackTrace();
+            Express.log.info("Model not found", e);
         }
     }
 
@@ -62,7 +63,7 @@ public class Database {
         try {
             init(dbPath);
         } catch (ModelsNotFoundException e) {
-            e.printStackTrace();
+            Express.log.info("Model not found", e);
         }
     }
 
@@ -73,7 +74,7 @@ public class Database {
         try {
             init(dbPath);
         } catch (ModelsNotFoundException e) {
-            e.printStackTrace();
+            Express.log.info("Model not found", e);
         }
     }
 
@@ -85,8 +86,6 @@ public class Database {
     }
 
     private static void init(String dbPath) throws ModelsNotFoundException {
-        logger = Logger.getLogger(Database.class.getSimpleName());
-
         File directory = new File(Paths.get(dbPath).toString());
         directory.getParentFile().mkdirs(); // create parent dirs if necessary
 
@@ -158,7 +157,7 @@ public class Database {
             try {
                 for(Object obj : objects) models.add(mapper.readValue(mapper.writeValueAsBytes(obj), klass));
             } catch (UnrecognizedPropertyException e) {
-                logger.log(Level.WARNING, "Could not convert JSON.", e);
+                Express.log.info("Could not convert JSON.", e);
                 res.status(500).stop(e.getMessage());
             }
             res.json(collection(klass).save(models));
@@ -180,8 +179,13 @@ public class Database {
         });
 
         express.useStatic("/public", Location.CLASSPATH);
-
+    
+    
+        JavalinUtil.startingServer = false;
         express.listen(9595);
+        JavalinUtil.startingServer = true;
+//        JavalinUtil.disableJavalinLogger();
+        Express.log.info("Browse collections at http://localhost:" + 9595);
     }
 
     public static Collection collection(Object model) {
@@ -194,7 +198,7 @@ public class Database {
         try {
             return getColl(klass);
         } catch (DatabaseNotEnabledException | NullPointerException e) {
-            logger.log(Level.WARNING, "Database not enabled.", e);
+            Express.log.info("Database not enabled.", e);
         }
         return null;
     }

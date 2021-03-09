@@ -13,7 +13,7 @@ app.listen(3000); // Will listen on port 3000
 
 ### Download
 **Direct download as jar:** 
-[Latest java-express-1.0.6.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.6.jar)
+[Latest java-express-1.0.7.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.7.jar)
 
 **Old version:**
 [Older versions](https://github.com/Aarkan1/java-express/tree/master/releases)
@@ -32,7 +32,7 @@ app.listen(3000); // Will listen on port 3000
 <dependency>
     <groupId>com.github.Aarkan1</groupId>
     <artifactId>java-express</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Aarkan1:java-express:1.0.6'
+    implementation 'com.github.Aarkan1:java-express:1.0.7'
 }
 ```
 
@@ -60,7 +60,7 @@ See [Javalin api documentation](https://javalin.io/documentation).
 - [Response](#response)
 - [Collection](#collection)
 - [Static Files](#static-files)
-- [Single page mode](#single-page-mode)
+- [Static fallback mode](#static-fallback-mode)
 - [Uploads](#uploads)
 - [WebSockets](#websockets)
 - [Server-sent Events](#server-sent-events)
@@ -81,8 +81,8 @@ app.enableCollections(CollectionOptions... options)     //
 app.enableCollections(String dbPath, CollectionOptions... options)   //
 app.useStatic(Path path)                                // 
 app.useStatic(String path, Location location)           // 
-app.useSinglePageApp(String url, Path filePath)         // 
-app.useSinglePageApp(String url, String filePath, Location location) //
+app.useStaticFallback(String url, Path filePath)        // 
+app.useStaticFallback(String url, String filePath, Location location) //
 app.cors()                                              // 
 app.cors(String origin)                                 // 
 app.devLogging()                                        // 
@@ -683,12 +683,12 @@ If you do `app.useStatic(Paths.get("src/folder"))`. Your index.html file at /src
 
 You can call `useStatic` multiple times to set up multiple handlers.
 
-## Single page mode
+## Static fallback mode
 _src: [Javalin docs](https://javalin.io/documentation#single-page-mode)_
 
-Single page mode is similar to static file handling. It runs after endpoint matching and after static file handling. It’s basically a very fancy 404 mapper, which converts any 404’s into a specified page. You can define multiple single page handlers for your application by specifying different root paths.
+Static fallback mode is similar to static file handling. It runs after endpoint matching and after static file handling. It’s basically a very fancy 404 mapper, which converts any 404’s into a specified page. You can define multiple fallback page handlers for your application by specifying different root paths.
 
-You can enabled single page mode by doing `app.useSinglePageApp("/", Paths.get("src/folder/index.html"))`, and/or `app.useSinglePageApp("/", "/classpath/to/index.html", Location.INTERNAL)`.
+You can enabled single page mode by doing `app.useStaticFallback("/", Paths.get("src/folder/index.html"))`, and/or `app.useStaticFallback("/", "/classpath/to/index.html", Location.INTERNAL)`.
 
 ## Uploads
 Uploaded files are easily accessible via `req.formDataFile()`:

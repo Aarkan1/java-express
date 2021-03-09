@@ -10,6 +10,10 @@ express/database/WatchHandler.java
  express.database.WatchHandler
 express/database/Database.java
  express.database.Database
+express/JavalinUtil.java
+ express.JavalinUtil
+ express.JavalinUtil$1
+ express.JavalinUtil$NoopLogger
 express/database/CollectionOptions.java
  express.database.CollectionOptions
 express/Express.java

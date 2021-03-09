@@ -10,6 +10,8 @@ import io.javalin.core.JavalinConfig;
 import io.javalin.http.sse.SseClient;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.WsHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -26,17 +28,22 @@ public class Express {
     private final Javalin app;
     private final Map<String, Object> locals = new ConcurrentHashMap<>();
     private Database db;
-
+    
+    public static Logger log = LoggerFactory.getLogger(Express.class);
+ 
     public Express() {
-        app = Javalin.create();
-        app.config.showJavalinBanner = false;
-        Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
+        this(null);
     }
 
     public Express(Consumer<JavalinConfig> config) {
-        app = Javalin.create(config);
+        JavalinUtil.disableJavalinLogger();
+        if(config != null) app = Javalin.create(config);
+        else app = Javalin.create();
         app.config.showJavalinBanner = false;
         Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
+        
+        app.events(event -> event.serverStartFailed(() ->
+            Express.log.error("Failed to start Express")));
     }
 
     /**
@@ -103,7 +110,7 @@ public class Express {
      * @param filePath
      * @return
      */
-    public Express useSinglePageApp(String url, Path filePath) {
+    public Express useStaticFallback(String url, Path filePath) {
         app.config.addSinglePageRoot(url, filePath.toString(), Location.EXTERNAL);
         return this;
     }
@@ -115,7 +122,7 @@ public class Express {
      * @param filePath
      * @return
      */
-    public Express useSinglePageApp(String url, String filePath, Location location) {
+    public Express useStaticFallback(String url, String filePath, Location location) {
         app.config.addSinglePageRoot(url, filePath, location);
         return this;
     }
@@ -240,13 +247,22 @@ public class Express {
 
     public void listen(int port) {
         app.start(port);
+        JavalinUtil.reEnableJavalinLogger();
+        Javalin.log.info("Server listening on http://localhost:" + port);
     }
 
     public void listen(String hostname, int port) {
         app.start(hostname, port);
+        JavalinUtil.reEnableJavalinLogger();
+        Javalin.log.info("Server listening on http://" + hostname + ":" + port);
     }
 
-    public void stop() { app.stop(); }
+    public void stop() {
+        JavalinUtil.disableJavalinLogger();
+        app.stop();
+        JavalinUtil.reEnableJavalinLogger();
+        Express.log.info("Express has stopped");
+    }
 
 
 //    public Express mountpath() { return this; }
