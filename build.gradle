@@ -5,11 +5,11 @@ apply plugin: 'maven'
 group 'org.express'
 version '1.0.12'
 
-jar {
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
+//jar {
+//    from {
+//        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+//    }
+//}
 
 compileJava {
     sourceCompatibility = '1.8'
@@ -20,9 +20,7 @@ repositories {
 }
 
 dependencies {
-    compile('io.javalin:javalin:3.13.3') {
-        exclude group: 'org.slf4j'
-    }
+    compile 'io.javalin:javalin:3.13.3'
     compile 'org.dizitart:nitrite:3.4.2'
     compile 'net.oneandone.reflections8:reflections8:0.11.7'
     compile 'org.slf4j:slf4j-simple:1.7.28'
