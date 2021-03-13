@@ -13,7 +13,7 @@ app.listen(4000); // Will listen on port 4000
 
 ### Download
 **Direct download as jar:** 
-[Latest java-express-1.0.13.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.13.jar)
+[Latest java-express-1.0.14.jar](https://github.com/Aarkan1/java-express/raw/main/releases/java-express-1.0.14.jar)
 
 **Old version:**
 [Older versions](https://github.com/Aarkan1/java-express/tree/master/releases)
@@ -32,7 +32,7 @@ app.listen(4000); // Will listen on port 4000
 <dependency>
     <groupId>com.github.Aarkan1</groupId>
     <artifactId>java-express</artifactId>
-    <version>1.0.13</version>
+    <version>1.0.14</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Aarkan1:java-express:1.0.13'
+    implementation 'com.github.Aarkan1:java-express:1.0.14'
 }
 ```
 
