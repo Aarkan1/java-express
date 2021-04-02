@@ -4,20 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import express.Express;
 import express.JavalinUtil;
-import express.database.exceptions.DatabaseNotEnabledException;
 import express.database.exceptions.ModelsNotFoundException;
 import io.javalin.http.UploadedFile;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.WsContext;
-import org.dizitart.no2.Nitrite;
-import org.dizitart.no2.objects.Id;
+import nosqlite.annotations.Document;
 import org.reflections8.Reflections;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static nosqlite.Database.collection;
 
 /**
  * @author Johan Wirén
@@ -27,7 +26,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Documentation: https://www.dizitart.org/nitrite-database
  */
 public class Database {
-    private static Map<String, Collection> collections = new HashMap<>();
     private static List<WsContext> clients = new CopyOnWriteArrayList<>();
     private static boolean enabledDatabase = false;
     private static Express app;
@@ -38,7 +36,7 @@ public class Database {
     public Database(Express app) {
         Database.app = app;
         try {
-            init("db/embedded.db");
+            init();
         } catch (ModelsNotFoundException e) {
             Express.log.info("Model not found", e);
         }
@@ -49,27 +47,7 @@ public class Database {
         setOptions(options);
 
         try {
-            init("db/embedded.db");
-        } catch (ModelsNotFoundException e) {
-            Express.log.info("Model not found", e);
-        }
-    }
-
-    public Database(String dbPath, Express app) {
-        Database.app = app;
-        try {
-            init(dbPath);
-        } catch (ModelsNotFoundException e) {
-            Express.log.info("Model not found", e);
-        }
-    }
-
-    public Database(String dbPath, Express app, CollectionOptions... options) {
-        Database.app = app;
-        setOptions(options);
-
-        try {
-            init(dbPath);
+            init();
         } catch (ModelsNotFoundException e) {
             Express.log.info("Model not found", e);
         }
@@ -82,17 +60,9 @@ public class Database {
         }
     }
 
-    private static void init(String dbPath) throws ModelsNotFoundException {
-        File directory = new File(Paths.get(dbPath).toString());
-        directory.getParentFile().mkdirs(); // create parent dirs if necessary
-
-        Nitrite db = Nitrite.builder()
-                .compressed()
-                .filePath(Paths.get(dbPath).toString())
-                .openOrCreate("fwEWfwGhjyuYThtgSD", "dWTRgvVBfeeetgFR");
-
+    private static void init() throws ModelsNotFoundException {
         Reflections reflections = new Reflections();
-        Set<Class<?>> klasses = reflections.getTypesAnnotatedWith(Model.class);
+        Set<Class<?>> klasses = reflections.getTypesAnnotatedWith(Document.class);
         Map<String, Class<?>> collNames = new HashMap<>();
         Map<String, String> idFields = new HashMap<>();
 
@@ -100,16 +70,7 @@ public class Database {
 
         klasses.forEach(klass -> {
             String klassName = klass.getSimpleName();
-
-            for(Field field : klass.getDeclaredFields()) {
-                if(field.isAnnotationPresent(Id.class)) {
-                    idFields.putIfAbsent(klassName, field.getName());
-                    break;
-                }
-            }
-
             collNames.putIfAbsent(klassName, klass);
-            collections.putIfAbsent(klassName, new Collection(db.getRepository(klass), klass, idFields.get(klassName)));
         });
 
         enabledDatabase = true;
@@ -117,7 +78,6 @@ public class Database {
         if(!disableBrowser) initBrowser(collNames, idFields);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            db.close();
             if(express != null) express.stop();
         }));
     }
@@ -183,29 +143,6 @@ public class Database {
         JavalinUtil.startingServer = true;
 //        JavalinUtil.disableJavalinLogger();
         Express.log.info("Browse collections at http://localhost:" + 9595);
-    }
-
-    public static Collection collection(Object model) {
-        return collection(model.getClass().getSimpleName());
-    }
-
-    public static Collection collection(Class klass) { return collection(klass.getSimpleName()); }
-
-    public static Collection collection(String klass) {
-        try {
-            return getColl(klass);
-        } catch (DatabaseNotEnabledException | NullPointerException e) {
-            Express.log.info("Database not enabled.", e);
-        }
-        return null;
-    }
-
-    private static Collection getColl(String klass) throws DatabaseNotEnabledException {
-        if(enabledDatabase) {
-            return collections.get(klass);
-        } else {
-            throw new DatabaseNotEnabledException("Database is not enabled");
-        }
     }
 
     private static void watchCollections(Map<String, Class<?>> collNames) {

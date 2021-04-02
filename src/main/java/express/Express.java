@@ -56,45 +56,45 @@ public class Express {
         return app;
     }
 
-    /**
-     * Enable the embedded document database
-     *
-     * @return
-     */
-    public Express enableCollections() {
-        db = new Database(this);
-        return this;
-    }
-
-    /**
-     * Enable the embedded document database
-     *
-     * @return
-     */
-    public Express enableCollections(String dbPath) {
-        db = new Database(dbPath, this);
-        return this;
-    }
-
-    /**
-     * Enable the embedded document database
-     *
-     * @return
-     */
-    public Express enableCollections(CollectionOptions... options) {
-        db = new Database(this, options);
-        return this;
-    }
-
-    /**
-     * Enable the embedded document database
-     *
-     * @return
-     */
-    public Express enableCollections(String dbPath, CollectionOptions... options) {
-        db = new Database(dbPath, this, options);
-        return this;
-    }
+//    /**
+//     * Enable the embedded document database
+//     *
+//     * @return
+//     */
+//    public Express enableCollections() {
+//        db = new Database(this);
+//        return this;
+//    }
+//
+//    /**
+//     * Enable the embedded document database
+//     *
+//     * @return
+//     */
+//    public Express enableCollections(String dbPath) {
+//        db = new Database(dbPath, this);
+//        return this;
+//    }
+//
+//    /**
+//     * Enable the embedded document database
+//     *
+//     * @return
+//     */
+//    public Express enableCollections(CollectionOptions... options) {
+//        db = new Database(this, options);
+//        return this;
+//    }
+//
+//    /**
+//     * Enable the embedded document database
+//     *
+//     * @return
+//     */
+//    public Express enableCollections(String dbPath, CollectionOptions... options) {
+//        db = new Database(dbPath, this, options);
+//        return this;
+//    }
 
     public Express useStatic(Path path) {
         useStatic(path.toString(), Location.EXTERNAL);
