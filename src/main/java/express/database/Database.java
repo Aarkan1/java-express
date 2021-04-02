@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import express.Express;
 import express.JavalinUtil;
-import express.database.exceptions.ModelsNotFoundException;
 import io.javalin.http.UploadedFile;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.WsContext;
@@ -21,61 +20,30 @@ import static nosqlite.Database.collection;
 /**
  * @author Johan Wirén
  *
- * The embedded database based on Nitrite DB
- *
- * Documentation: https://www.dizitart.org/nitrite-database
  */
 public class Database {
     private static List<WsContext> clients = new CopyOnWriteArrayList<>();
-    private static boolean enabledDatabase = false;
     private static Express app;
     private static Express express;
-    private static boolean enableWatcher = false;
-    private static boolean disableBrowser = false;
 
     public Database(Express app) {
         Database.app = app;
-        try {
-            init();
-        } catch (ModelsNotFoundException e) {
-            Express.log.info("Model not found", e);
-        }
+        init();
     }
 
-    public Database(Express app, CollectionOptions... options) {
-        Database.app = app;
-        setOptions(options);
-
-        try {
-            init();
-        } catch (ModelsNotFoundException e) {
-            Express.log.info("Model not found", e);
-        }
-    }
-
-    private static void setOptions(CollectionOptions... options) {
-        for (CollectionOptions option : options) {
-            if(option == CollectionOptions.ENABLE_WATCHER) enableWatcher = true;
-            else if(option == CollectionOptions.DISABLE_BROWSER) disableBrowser = true;
-        }
-    }
-
-    private static void init() throws ModelsNotFoundException {
+    private static void init() {
         Reflections reflections = new Reflections();
         Set<Class<?>> klasses = reflections.getTypesAnnotatedWith(Document.class);
         Map<String, Class<?>> collNames = new HashMap<>();
         Map<String, String> idFields = new HashMap<>();
-
-        if(klasses.isEmpty()) throw new ModelsNotFoundException("Must have a class with @Model to use embedded database.");
 
         klasses.forEach(klass -> {
             String klassName = klass.getSimpleName();
             collNames.putIfAbsent(klassName, klass);
         });
 
-        enabledDatabase = true;
-        if (enableWatcher) watchCollections(collNames);
-        if(!disableBrowser) initBrowser(collNames, idFields);
+        if (nosqlite.Database.useWatchers) watchCollections(collNames);
+        if (nosqlite.Database.useBrowser) initBrowser(collNames, idFields);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if(express != null) express.stop();

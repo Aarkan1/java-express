@@ -12,10 +12,10 @@ express/database/CollectionOptions.java
  express.database.CollectionOptions
 express/Express.java
  express.Express
-express/database/exceptions/ModelsNotFoundException.java
- express.database.exceptions.ModelsNotFoundException
 express/http/Response.java
  express.http.Response
+express/database/exceptions/ModelsNotFoundException.java
+ express.database.exceptions.ModelsNotFoundException
 express/http/MediaType.java
  express.http.MediaType
 express/http/Request.java
