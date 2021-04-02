@@ -107,7 +107,7 @@ public class Database {
     
     
         JavalinUtil.startingServer = false;
-        express.listen(9595);
+        express.collectionBrowserListen(9595);
         JavalinUtil.startingServer = true;
 //        JavalinUtil.disableJavalinLogger();
         Express.log.info("Browse collections at http://localhost:" + 9595);

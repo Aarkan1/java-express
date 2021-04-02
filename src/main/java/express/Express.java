@@ -1,12 +1,10 @@
 package express;
 
-import express.database.CollectionOptions;
 import express.database.Database;
 import express.http.HttpContextHandler;
 import express.http.Request;
 import express.http.Response;
 import io.javalin.Javalin;
-import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.core.JavalinConfig;
 import io.javalin.http.sse.SseClient;
 import io.javalin.http.staticfiles.Location;
@@ -20,7 +18,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import static io.javalin.apibuilder.ApiBuilder.*;
 
 /**
  * The Express layer on top of Javalin
@@ -224,6 +221,10 @@ public class Express {
         app.start(hostname, port);
         JavalinUtil.reEnableJavalinLogger();
         Javalin.log.info("Server listening on http://" + hostname + ":" + port);
+    }
+    
+    public void collectionBrowserListen(int port) {
+        app.start(port);
     }
 
     public void stop() {
