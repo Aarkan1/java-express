@@ -27,7 +27,6 @@ import java.util.function.Consumer;
 public class Express {
     private final Javalin app;
     private final Map<String, Object> locals = new ConcurrentHashMap<>();
-    private Database db;
     
     public static Logger log = LoggerFactory.getLogger(Express.class);
  
