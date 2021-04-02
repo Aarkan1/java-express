@@ -203,18 +203,17 @@ Marks a class to be used with a collection. Is required if an object is going to
 
 ### @Id Annotation
 Each object in a Collection must be uniquely identified by a field marked with **@Id** annotation. The collection maintains an unique index on that field to identify the objects.
-If no id is manually set, the Collection will generate an UUID to that field when inserted or saved. 
+If no id is manually set, the Collection will generate an UUID to that field when inserted or saved.
 
 ```java
-import express.database.Model;
+
 import org.dizitart.no2.objects.Id;
 
-@Model
 public class MyType {
-
-    @Id
-    private String id;
-    private String name;
+  
+  @Id
+  private String id;
+  private String name;
 }
 ```
 
