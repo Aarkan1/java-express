@@ -8,9 +8,11 @@ import io.javalin.http.UploadedFile;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.WsContext;
 import nosqlite.annotations.Document;
+import nosqlite.annotations.Id;
 import org.reflections8.Reflections;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -40,6 +42,13 @@ public class Database {
         klasses.forEach(klass -> {
             String klassName = klass.getSimpleName();
             collNames.putIfAbsent(klassName, klass);
+    
+            for(Field field : klass.getDeclaredFields()) {
+                if(field.isAnnotationPresent(Id.class)) {
+                    idFields.putIfAbsent(klassName, field.getName());
+                    break;
+                }
+            }
         });
 
         if (nosqlite.Database.useWatchers) watchCollections(collNames);
