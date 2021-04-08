@@ -222,10 +222,6 @@ public class Express {
         Javalin.log.info("Server listening on http://" + hostname + ":" + port);
     }
     
-    public void collectionBrowserListen(int port) {
-        app.start(port);
-    }
-
     public void stop() {
         JavalinUtil.disableJavalinLogger();
         app.stop();

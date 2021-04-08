@@ -10,8 +10,8 @@ export default {
                 <button @click="openDropCollModal" class="button-warn">Drop</button>
                 <button @click="exportJSON">Export</button>
                 <button v-if="isImporting"><div class="loader"></div></button>
-                <button v-else @click="importJSON">Import</button>
-                <input type="file" accept="application/json" ref="jsonFile">
+                <button v-else :disabled="jsonFilesNotLoaded" @click="importJSON">Import</button>
+                <input type="file" accept="application/json" ref="jsonFile" @change="filesLoaded">
             </div>
                 <p v-if="errorMessage" id="important-note">
                     Failed to import json: <br>
@@ -27,6 +27,7 @@ export default {
         const jsonFile = ref()
         const errorMessage = ref('')
         const isImporting = ref(false)
+        const jsonFilesNotLoaded = ref(true)
         const activeColl = computed(() => store.state.activeColl)
         const collection = computed(() => store.state.collections)
         const fetchingColls = computed(() => store.state.fetchingColls)
@@ -44,6 +45,14 @@ export default {
         watch([activeColl, collection], () => {
             renderJson(store.getters.activeCollection)
         })
+
+        const filesLoaded = () => {
+            if(jsonFile.value && jsonFile.value.files.length < 1) {
+                jsonFilesNotLoaded.value = true
+            } else {
+                jsonFilesNotLoaded.value = false
+            }
+        }
         
         // init json tree render
         onMounted(() => {
@@ -97,7 +106,7 @@ export default {
             errorMessage.value = ''
             isImporting.value = true
 
-            if(jsonFile.value.files.length < 1) {
+            if(jsonFilesNotLoaded.value) {
                 setTimeout(() => {
                     isImporting.value = false
                 }, 150)
@@ -156,6 +165,8 @@ export default {
             fetchingColls,
             errorMessage,
             isImporting,
+            jsonFilesNotLoaded,
+            filesLoaded,
             openDropCollModal
         }
     }

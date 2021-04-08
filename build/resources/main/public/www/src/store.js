@@ -12,10 +12,17 @@ const state = {
         header: ''
     },
     openDropCollModal: false,
+    showDocumentAnchors: false,
     fetchingColls: false
 }
 
 const mutations = {
+    setShowDocumentAnchors(state, display) {
+        state.showDocumentAnchors = display
+    },
+    toggleShowDocumentAnchors(state) {
+        state.showDocumentAnchors = !state.showDocumentAnchors
+    },
     setModal(state, modal) {
         state.openModal = modal
     },
@@ -72,7 +79,7 @@ const actions = {
         const [idField, collection] = Object.entries(data)[0]
         
         store.commit('addCollIdFields', {coll, idField})
-        store.commit('addCollection', {coll, collection})
+        store.commit('addCollection', {coll, collection: JSON.parse(collection)})
         
         if(coll === store.state.activeColl || Object.keys(store.state.collections).length === store.state.collNames.length) {
             store.commit('setFetchingColls', false)

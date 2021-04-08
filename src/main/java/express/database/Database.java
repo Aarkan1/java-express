@@ -70,7 +70,7 @@ public class Database {
         express.get("/rest/:coll", (req, res) -> {
             String coll = req.params("coll");
             Map data = new HashMap();
-            data.put(idFields.get(coll), collection(coll).find());
+            data.put(idFields.get(coll), collection(coll).findAsJson());
             res.json(data);
         });
 
@@ -116,7 +116,7 @@ public class Database {
     
     
         JavalinUtil.startingServer = false;
-        express.collectionBrowserListen(9595);
+        express.raw().start(9595);
         JavalinUtil.startingServer = true;
 //        JavalinUtil.disableJavalinLogger();
         Express.log.info("Browse collections at http://localhost:" + 9595);

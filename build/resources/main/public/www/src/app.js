@@ -3,7 +3,7 @@ import collections from './components/collections.js'
 import modal from './components/modal.js'
 import * as pages from './components/pages.js'
 
-const { watchEffect, ref } = Vue
+const { watchEffect, ref, computed } = Vue
 const { useStore } = Vuex
 
 export default {
@@ -15,22 +15,30 @@ export default {
         </header>
         <sidebar :displayCollections="displayCollections">
             <button v-for="item in pages" :key="item.name" @click="routeTo(item.name)">{{ item.name }}</button>
-            <ul v-if="page == 'documentation'">
+            <ul v-if="page == 'documentation' && showDocumentAnchors">
                 <li><a href="#getting-started">Getting started</a></li>
-                <li><a href="#collectionoptions">CollectionOptions</a></li>
+                <li><a href="#collectionconfig">CollectionConfig</a>
+                    <ul>
+                        <li><a href="#watcher">Watcher</a></li>
+                        <li><a href="#browser">Browser</a></li>
+                    </ul>
+                </li>
+                <li><a href="#document">Document</a></li>
+                <li><a href="#collection-methods">Collection methods</a>
+                    <ul>
+                        <li><a href="#filters">Filters</a></li>
+                        <li><a href="#findoptions">FindOptions</a></li>
+                    </ul>
+                </li>
+                <li><a href="#collection-examples">Collection Examples</a></li>
+                <li><a href="#filter-nested-objects">Filter nested objects</a></li>
                 <li><a href="#import">Import</a></li>
                 <li><a href="#export">Export</a></li>
-                <li><a href="#drop">Drop</a></li>
-                <ul>
-                    <li><a href="#important-note">Important note!</a></li>
-                </ul>
-                <li><a href="#model">Model</a></li>
-                <li><a href="#collection-methods">Collection methods</a></li>
-                <ul>
-                    <li><a href="#filters">Filters</a></li>
-                    <li><a href="#findoptions">FindOptions</a></li>
-                </ul>
-                <li><a href="#examples">Examples</a></li>
+                <li><a href="#drop">Drop</a>
+                    <ul>
+                        <li><a href="#important-note">Important note</a></li>
+                    </ul>
+                </li>
             </ul>
             <button @click="routeTo()">Collections</button>
         </sidebar>
@@ -46,6 +54,7 @@ export default {
 
         const page = ref(null)
         const displayCollections = ref(true)
+        const showDocumentAnchors = computed(() => store.state.showDocumentAnchors)
 
         //url management
         watchEffect(() => {
@@ -67,9 +76,14 @@ export default {
             if(!url) {
                 page.value = ''
                 displayCollections.value = true
+                showDocumentAnchors.value = false
             } else {   
                 page.value = url.toLowerCase()
                 displayCollections.value = false
+
+                if (page.value == 'documentation') {
+                    store.commit('toggleShowDocumentAnchors')
+                } 
             }
         }
 
@@ -77,6 +91,7 @@ export default {
             page, 
             pages, 
             displayCollections,
+            showDocumentAnchors,
             routeTo
         }
     }

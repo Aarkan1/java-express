@@ -27,6 +27,10 @@ aside a {
     color: #dbdbdb;
 }
 
+aside a:hover {
+    color: #ffffff;
+}
+
 .loader {
     border-top: 0.6em solid rgba(255, 255, 255, 0.2);
     border-right: 0.6em solid rgba(255, 255, 255, 0.2);
