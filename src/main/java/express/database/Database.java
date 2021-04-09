@@ -65,6 +65,8 @@ public class Database {
     private static void initBrowser(Map<String, Class<?>> collNames, Map<String, String> idFields) {
         express = new Express();
 
+        express.get("/rest/docs", (req, res) -> res.send(BrowserDocumentation.docs));
+        
         express.get("/rest/collNames", (req, res) -> res.json(collNames.keySet()));
 
         express.get("/rest/:coll", (req, res) -> {

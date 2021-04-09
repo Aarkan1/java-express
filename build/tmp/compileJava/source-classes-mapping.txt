@@ -1,5 +1,7 @@
 express/database/Database.java
  express.database.Database
+express/database/BrowserDocumentation.java
+ express.database.BrowserDocumentation
 express/http/HttpContextHandler.java
  express.http.HttpContextHandler
 express/database/exceptions/DatabaseNotEnabledException.java
