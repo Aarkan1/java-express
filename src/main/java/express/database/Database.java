@@ -15,6 +15,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static nosqlite.Database.collection;
@@ -25,6 +26,7 @@ import static nosqlite.Database.collection;
  */
 public class Database {
     private static List<WsContext> clients = new CopyOnWriteArrayList<>();
+    private static Map<String, List<WsContext>> clientsMap = new ConcurrentHashMap<>();
     private static Express app;
     private static Express express;
 
@@ -116,11 +118,9 @@ public class Database {
 
         express.useStatic("/public", Location.CLASSPATH);
     
-    
         JavalinUtil.startingServer = false;
         express.raw().start(9595);
         JavalinUtil.startingServer = true;
-//        JavalinUtil.disableJavalinLogger();
         Express.log.info("Browse collections at http://localhost:" + 9595);
     }
 
@@ -133,6 +133,20 @@ public class Database {
                     clients.stream().filter(client -> client.session.isOpen())
                     .forEach(client -> client.send(watchData))
             ));
+        });
+        
+        app.ws("/watch-collections/:coll", ws -> {
+            ws.onConnect(ctx -> {
+                String coll = ctx.pathParam("coll");
+                clientsMap.putIfAbsent(coll, new CopyOnWriteArrayList<>());
+                clientsMap.get(coll).add(ctx);
+    
+                collection(coll).watch(watchData ->
+                    clientsMap.get(coll).stream().filter(client -> client.session.isOpen())
+                        .forEach(client -> client.send(watchData)));
+            });
+            
+            ws.onClose(ctx -> clientsMap.get(ctx.pathParam("coll")).remove(ctx));
         });
     }
 

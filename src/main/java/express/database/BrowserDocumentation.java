@@ -1,5 +1,10 @@
 package express.database;
 
+/**
+ * @author Johan Wirén
+ *
+ * The NoSQLite documentation as html.
+ */
 class BrowserDocumentation {
   static final String docs =
       "<h1 id=\"nosqlite\">NoSQLite</h1>\n" +
