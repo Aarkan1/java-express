@@ -6,42 +6,46 @@ app.get("/", (req, res) -> {
    res.send("Hello World");
 });
 
-app.listen(4000); // Will listen on port 4000
+app.listen(4000); // Start server on port 4000
 ```
 
 # Installation
 
 ### Download
-**Direct download as jar:** 
+> Direct download as jar:
+
 [java-express-1.1.3.jar](https://github.com/Aarkan1/java-express/releases/download/1.1.3/java-express-1.1.3.jar)
 
 ### Maven
-> Add repository:
+> Add this to your pom.xml
+
 ```xml
-<repository>
+<repositories>
+  <repository>
     <id>jitpack.io</id>
     <url>https://jitpack.io</url>
-</repository>
-```
+  </repository>
+</repositories>
 
-> Add dependency:
-```xml
-<dependency>
+<dependencies>
+  <dependency>
     <groupId>com.github.Aarkan1</groupId>
     <artifactId>java-express</artifactId>
     <version>1.1.3</version>
-</dependency>
+  </dependency>
+</dependencies>
 ```
 
 ### Gradle
 > Add this to your build.gradle
+
 ```golang
 repositories {
     maven { url "https://jitpack.io/" }
 }
 
 dependencies {
-    implementation 'com.github.Aarkan1:java-express:1.1.3'
+    compile 'com.github.Aarkan1:java-express:1.1.3'
 }
 ```
 
