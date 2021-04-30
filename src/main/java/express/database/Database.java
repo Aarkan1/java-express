@@ -43,7 +43,9 @@ public class Database {
 
         klasses.forEach(klass -> {
             String klassName = klass.getSimpleName();
-            collNames.putIfAbsent(klassName, klass);
+            if(!klass.getPackage().getName().contains("test_entities")) {
+                collNames.putIfAbsent(klassName, klass);
+            }
     
             for(Field field : klass.getDeclaredFields()) {
                 if(field.isAnnotationPresent(Id.class)) {

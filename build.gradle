@@ -3,8 +3,9 @@ apply plugin: 'idea'
 apply plugin: 'maven'
 
 group 'org.express'
-version '1.1.1'
+version '1.1.2'
 
+// uncomment when building jar
 //jar {
 //    from {
 //        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
@@ -21,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.Aarkan1:nosqlite:7ba4b9b'
+    compile 'com.github.Aarkan1:nosqlite:1.0.3'
     compile 'io.javalin:javalin:3.13.3'
     compile 'net.oneandone.reflections8:reflections8:0.11.7'
     compile 'org.slf4j:slf4j-simple:1.7.28'
